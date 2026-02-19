@@ -322,12 +322,11 @@ body.o_dark .o_attendance_analytics .o_detail_row:hover,
 }
 
 .o_modern_row {
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: background 0.3s ease;
 }
 
 .o_modern_row:hover {
     background: linear-gradient(90deg, rgba(52, 152, 219, 0.03) 0%, rgba(155, 89, 182, 0.03) 100%);
-    transform: translateX(4px);
 }
 
 .o_icon_wrapper {

@@ -283,15 +283,22 @@
 
             <!-- Attendance Table -->
             <div class="card border-0 o_attendance_table_card mb-5" style="border-radius: 20px; overflow: hidden; background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%); box-shadow: 0 8px 32px rgba(0,0,0,0.08);">
-                <div class="card-header border-0 py-4 px-4 d-flex justify-content-between align-items-center" style="background: rgba(255,255,255,0.9); backdrop-filter: blur(10px);">
+                <div class="card-header border-0 py-4 px-4 d-flex justify-content-between align-items-center flex-wrap gap-2" style="background: rgba(255,255,255,0.9); backdrop-filter: blur(10px);">
                     <h5 class="fw-bold mb-0" style="color: #2c3e50; letter-spacing: -0.5px;">Attendance History</h5>
-                    <select class="form-select" t-model="state.detailStatusFilter" t-on-change="(ev) => this.onDetailStatusFilterChange(ev)" style="width: auto; border-radius: 12px; border: 1px solid #dee2e6; font-size: 14px;">
-                        <option value="all">All Status</option>
-                        <option value="present">Present</option>
-                        <option value="late">Late</option>
-                        <option value="sick">Sick</option>
-                        <option value="unpaid">Unpaid</option>
-                    </select>
+                    <div class="d-flex gap-2 align-items-center">
+                        <select class="form-select" t-model="state.pageSize" t-on-change="(ev) => this.onPageSizeChange(ev)" style="width: auto; border-radius: 12px; border: 1px solid #dee2e6; font-size: 14px;">
+                            <option value="20">20 per page</option>
+                            <option value="50">50 per page</option>
+                            <option value="100">100 per page</option>
+                        </select>
+                        <select class="form-select" t-model="state.detailStatusFilter" t-on-change="(ev) => this.onDetailStatusFilterChange(ev)" style="width: auto; border-radius: 12px; border: 1px solid #dee2e6; font-size: 14px;">
+                            <option value="all">All Status</option>
+                            <option value="present">Present</option>
+                            <option value="late">Late</option>
+                            <option value="sick">Sick</option>
+                            <option value="unpaid">Unpaid</option>
+                        </select>
+                    </div>
                 </div>
                 <div class="card-body p-0">
                     <div style="overflow-x: auto; -webkit-overflow-scrolling: touch;">
@@ -305,7 +312,7 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <t t-foreach="state.employeeData.attendances" t-as="att" t-key="att.id">
+                                <t t-foreach="getPaginatedAttendances()" t-as="att" t-key="att.id">
                                     <tr class="o_modern_row">
                                         <td class="px-4 py-3" style="border: none; border-bottom: 1px solid #f0f0f0;">
                                             <div class="d-flex align-items-center">
@@ -342,7 +349,7 @@
                                         </td>
                                     </tr>
                                 </t>
-                                <t t-if="!state.employeeData.attendances.length">
+                                <t t-if="!state.employeeData.filteredAttendances.length">
                                     <tr>
                                         <td colspan="4" class="text-center py-5" style="border: none;">
                                             <div style="opacity: 0.4;">
@@ -354,6 +361,22 @@
                                 </t>
                             </tbody>
                         </table>
+                    </div>
+                </div>
+                <div class="card-footer bg-white border-0 py-3 px-4 d-flex justify-content-between align-items-center" style="border-top: 1px solid #f0f0f0;">
+                    <div class="text-muted" style="font-size: 14px;">
+                        Showing <t t-esc="(state.currentPage - 1) * state.pageSize + 1"/> to <t t-esc="Math.min(state.currentPage * state.pageSize, state.employeeData.filteredAttendances.length)"/> of <t t-esc="state.employeeData.filteredAttendances.length"/> entries
+                    </div>
+                    <div class="d-flex gap-2">
+                        <button class="btn btn-sm btn-outline-secondary" t-on-click="() => this.prevPage()" t-att-disabled="state.currentPage === 1" style="border-radius: 8px;">
+                            <i class="fa fa-chevron-left"/>
+                        </button>
+                        <span class="align-self-center px-2" style="font-size: 14px; color: #6c757d;">
+                            Page <t t-esc="state.currentPage"/> of <t t-esc="getTotalPages()"/>
+                        </span>
+                        <button class="btn btn-sm btn-outline-secondary" t-on-click="() => this.nextPage()" t-att-disabled="state.currentPage === getTotalPages()" style="border-radius: 8px;">
+                            <i class="fa fa-chevron-right"/>
+                        </button>
                     </div>
                 </div>
             </div>

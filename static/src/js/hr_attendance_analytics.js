@@ -19,8 +19,8 @@ class HrAttendanceAnalytics extends Component {
         this.state = useState({
             loading: true,
             filter: "year",
-            startDate: this.getDefaultStartDate("year"),
-            endDate: this.getDefaultEndDate(),
+            startDate: new Date().getFullYear() + "-01-01",
+            endDate: new Date().getFullYear() + "-12-31",
             selectedYear: new Date().getFullYear(),
             collapsedCards: {},
             view: "dashboard",
@@ -31,6 +31,8 @@ class HrAttendanceAnalytics extends Component {
             detailEndDate: "",
             detailSelectedYear: new Date().getFullYear(),
             detailStatusFilter: "all",
+            currentPage: 1,
+            pageSize: 20,
             data: {
                 present: { value: "0%", list: [] },
                 late: { value: "0%", list: [] },
@@ -70,6 +72,10 @@ class HrAttendanceAnalytics extends Component {
     }
 
     getDefaultEndDate() {
+        if (this.state && this.state.filter === 'year') {
+            const year = this.state.selectedYear || new Date().getFullYear();
+            return year + '-12-31';
+        }
         return new Date().toISOString().split('T')[0];
     }
 
@@ -106,7 +112,36 @@ class HrAttendanceAnalytics extends Component {
 
     onDetailStatusFilterChange(ev) {
         this.state.detailStatusFilter = ev.target.value;
+        this.state.currentPage = 1;
         this.filterEmployeeAttendances();
+    }
+
+    onPageSizeChange(ev) {
+        this.state.pageSize = parseInt(ev.target.value);
+        this.state.currentPage = 1;
+    }
+
+    nextPage() {
+        const totalPages = Math.ceil(this.state.employeeData.filteredAttendances.length / this.state.pageSize);
+        if (this.state.currentPage < totalPages) {
+            this.state.currentPage++;
+        }
+    }
+
+    prevPage() {
+        if (this.state.currentPage > 1) {
+            this.state.currentPage--;
+        }
+    }
+
+    getPaginatedAttendances() {
+        const start = (this.state.currentPage - 1) * this.state.pageSize;
+        const end = start + this.state.pageSize;
+        return this.state.employeeData.filteredAttendances.slice(start, end);
+    }
+
+    getTotalPages() {
+        return Math.ceil(this.state.employeeData.filteredAttendances.length / this.state.pageSize);
     }
 
     onFilterChange(ev) {
@@ -332,7 +367,8 @@ class HrAttendanceAnalytics extends Component {
         this.state.employeeData = {
             stats,
             attendances,
-            allAttendances: attendances
+            allAttendances: attendances,
+            filteredAttendances: attendances
         };
 
         this.state.loading = false;
@@ -399,7 +435,9 @@ class HrAttendanceAnalytics extends Component {
         });
 
         this.state.employeeData.attendances = filtered;
+        this.state.employeeData.filteredAttendances = filtered;
         this.state.employeeData.stats = stats;
+        this.state.currentPage = 1;
     }
 }
 
