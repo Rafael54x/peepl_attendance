@@ -642,3 +642,14 @@ body.o_dark .o_modern_badge_unpaid,
 .o_card_icon_bg {
     flex-shrink: 0;
 }
+
+
+/* Hide scrollbar but keep scroll functionality */
+.o_detail_card_body {
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* IE and Edge */
+}
+
+.o_detail_card_body::-webkit-scrollbar {
+    display: none; /* Chrome, Safari, Opera */
+}
