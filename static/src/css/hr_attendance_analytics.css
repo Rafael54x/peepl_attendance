@@ -1,0 +1,224 @@
+.o_attendance_analytics {
+    height: 100vh;
+    overflow-y: auto;
+}
+
+.o_attendance_analytics .card {
+    transition: all 0.3s ease;
+    border-radius: 16px;
+}
+
+.o_attendance_analytics .card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 24px rgba(0,0,0,0.15) !important;
+}
+
+/* Summary Cards - Present */
+.o_card_present {
+    background: linear-gradient(135deg, #059669 0%, #047857 100%);
+}
+
+.o_card_present .o_card_label,
+.o_card_present .o_card_value,
+.o_card_present .o_card_desc,
+.o_card_present .o_card_icon {
+    color: #ffffff !important;
+}
+
+.o_card_present .o_card_label {
+    opacity: 0.9;
+    letter-spacing: 0.5px;
+}
+
+.o_card_present .o_card_value {
+    font-size: 2.5rem;
+}
+
+.o_card_present .o_card_desc {
+    opacity: 0.8;
+}
+
+.o_card_present .o_card_icon_bg {
+    background-color: rgba(255,255,255,0.2);
+}
+
+.o_card_present .o_card_icon {
+    font-size: 1.5rem;
+}
+
+/* Summary Cards - Late */
+.o_card_late {
+    background: linear-gradient(135deg, #d97706 0%, #b45309 100%);
+}
+
+.o_card_late .o_card_label,
+.o_card_late .o_card_value,
+.o_card_late .o_card_desc,
+.o_card_late .o_card_icon {
+    color: #ffffff !important;
+}
+
+.o_card_late .o_card_label {
+    opacity: 0.9;
+    letter-spacing: 0.5px;
+}
+
+.o_card_late .o_card_value {
+    font-size: 2.5rem;
+}
+
+.o_card_late .o_card_desc {
+    opacity: 0.8;
+}
+
+.o_card_late .o_card_icon_bg {
+    background-color: rgba(255,255,255,0.2);
+}
+
+.o_card_late .o_card_icon {
+    font-size: 1.5rem;
+}
+
+/* Summary Cards - Sick */
+.o_card_sick {
+    background: linear-gradient(135deg, #ea580c 0%, #c2410c 100%);
+}
+
+.o_card_sick .o_card_label,
+.o_card_sick .o_card_value,
+.o_card_sick .o_card_desc,
+.o_card_sick .o_card_icon {
+    color: #ffffff !important;
+}
+
+.o_card_sick .o_card_label {
+    opacity: 0.9;
+    letter-spacing: 0.5px;
+}
+
+.o_card_sick .o_card_value {
+    font-size: 2.5rem;
+}
+
+.o_card_sick .o_card_desc {
+    opacity: 0.8;
+}
+
+.o_card_sick .o_card_icon_bg {
+    background-color: rgba(255,255,255,0.2);
+}
+
+.o_card_sick .o_card_icon {
+    font-size: 1.5rem;
+}
+
+/* Summary Cards - Unpaid */
+.o_card_unpaid {
+    background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+}
+
+.o_card_unpaid .o_card_label,
+.o_card_unpaid .o_card_value,
+.o_card_unpaid .o_card_desc,
+.o_card_unpaid .o_card_icon {
+    color: #ffffff !important;
+}
+
+.o_card_unpaid .o_card_label {
+    opacity: 0.9;
+    letter-spacing: 0.5px;
+}
+
+.o_card_unpaid .o_card_value {
+    font-size: 2.5rem;
+}
+
+.o_card_unpaid .o_card_desc {
+    opacity: 0.8;
+}
+
+.o_card_unpaid .o_card_icon_bg {
+    background-color: rgba(255,255,255,0.2);
+}
+
+.o_card_unpaid .o_card_icon {
+    font-size: 1.5rem;
+}
+
+/* Detail Cards Headers */
+.o_detail_header_present {
+    background-color: #047857;
+}
+
+.o_detail_header_late {
+    background-color: #b45309;
+}
+
+.o_detail_header_sick {
+    background-color: #c2410c;
+}
+
+.o_detail_header_unpaid {
+    background-color: #b91c1c;
+}
+
+/* Detail Cards Rows */
+.o_detail_row {
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.o_detail_row:hover {
+    background-color: var(--o-view-background-color, #f8f9fa) !important;
+    transform: translateX(4px);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+
+/* Badges */
+.o_badge_present {
+    background-color: #a7f3d0;
+    color: #065f46;
+    font-weight: 700;
+}
+
+.o_badge_late {
+    background-color: #fde68a;
+    color: #78350f;
+    font-weight: 700;
+}
+
+.o_badge_sick {
+    background-color: #fed7aa;
+    color: #7c2d12;
+    font-weight: 700;
+}
+
+.o_badge_unpaid {
+    background-color: #fecaca;
+    color: #7f1d1d;
+    font-weight: 700;
+}
+
+/* Scrollbar */
+.o_attendance_analytics .card-body::-webkit-scrollbar {
+    width: 6px;
+}
+
+.o_attendance_analytics .card-body::-webkit-scrollbar-track {
+    background: var(--o-view-background-color, #f1f5f9);
+    border-radius: 10px;
+}
+
+.o_attendance_analytics .card-body::-webkit-scrollbar-thumb {
+    background: var(--o-border-color, #cbd5e1);
+    border-radius: 10px;
+}
+
+.o_attendance_analytics .card-body::-webkit-scrollbar-thumb:hover {
+    background: var(--o-text-muted, #94a3b8);
+}
+
+/* Dark Mode Support */
+.o_dark .o_detail_card {
+    background-color: var(--o-view-background-color);
+}

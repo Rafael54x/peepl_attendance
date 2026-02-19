@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="peepl_attendance.HrAttendanceAnalytics">
+        <div class="o_attendance_analytics p-4 pb-5" style="height: 100vh; overflow-y: auto;">
+            <div class="mb-4">
+                <h1 class="fs-3 fw-bold">HR Analytics Dashboard</h1>
+                <p class="text-muted">Laporan Kehadiran &amp; Absensi Karyawan</p>
+            </div>
+
+            <t t-if="state.loading">
+                <div class="text-center py-5">
+                    <i class="fa fa-spinner fa-spin fa-3x text-primary"/>
+                    <p class="mt-3 text-muted">Memuat data...</p>
+                </div>
+            </t>
+
+            <t t-else="">
+                <!-- Summary Cards -->
+                <div class="row g-4 mb-5" style="min-width: 800px;">
+                    <div class="col-12 col-md-6 col-lg-3">
+                        <div class="card border-0 shadow-sm h-100 o_card_present">
+                            <div class="card-body p-4">
+                                <div class="d-flex justify-content-between align-items-start">
+                                    <div>
+                                        <p class="fw-bold small mb-2 o_card_label">TOTAL PRESENT</p>
+                                        <h2 class="fw-bold mb-0 o_card_value"><t t-esc="state.data.present.value"/></h2>
+                                        <p class="small mt-2 mb-0 o_card_desc">Karyawan Hadir Tepat Waktu</p>
+                                    </div>
+                                    <div class="p-3 rounded-circle o_card_icon_bg">
+                                        <i class="fa fa-check o_card_icon"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-12 col-md-6 col-lg-3">
+                        <div class="card border-0 shadow-sm h-100 o_card_late">
+                            <div class="card-body p-4">
+                                <div class="d-flex justify-content-between align-items-start">
+                                    <div>
+                                        <p class="fw-bold small mb-2 o_card_label">TOTAL LATE ARRIVAL</p>
+                                        <h2 class="fw-bold mb-0 o_card_value"><t t-esc="state.data.late.value"/></h2>
+                                        <p class="small mt-2 mb-0 o_card_desc">Keterlambatan Masuk</p>
+                                    </div>
+                                    <div class="p-3 rounded-circle o_card_icon_bg">
+                                        <i class="fa fa-clock-o o_card_icon"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-12 col-md-6 col-lg-3">
+                        <div class="card border-0 shadow-sm h-100 o_card_sick">
+                            <div class="card-body p-4">
+                                <div class="d-flex justify-content-between align-items-start">
+                                    <div>
+                                        <p class="fw-bold small mb-2 o_card_label">TOTAL SICK LEAVE</p>
+                                        <h2 class="fw-bold mb-0 o_card_value"><t t-esc="state.data.sick.value"/></h2>
+                                        <p class="small mt-2 mb-0 o_card_desc">Izin Sakit</p>
+                                    </div>
+                                    <div class="p-3 rounded-circle o_card_icon_bg">
+                                        <i class="fa fa-medkit o_card_icon"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-12 col-md-6 col-lg-3">
+                        <div class="card border-0 shadow-sm h-100 o_card_unpaid">
+                            <div class="card-body p-4">
+                                <div class="d-flex justify-content-between align-items-start">
+                                    <div>
+                                        <p class="fw-bold small mb-2 o_card_label">TOTAL UNPAID LEAVE</p>
+                                        <h2 class="fw-bold mb-0 o_card_value"><t t-esc="state.data.unpaid.value"/></h2>
+                                        <p class="small mt-2 mb-0 o_card_desc">Cuti Tanpa Tanggungan</p>
+                                    </div>
+                                    <div class="p-3 rounded-circle o_card_icon_bg">
+                                        <i class="fa fa-exclamation-circle o_card_icon"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Detail Lists -->
+                <h3 class="fs-5 fw-semibold mb-3">Detail Karyawan</h3>
+                <div class="row g-4 mb-5" style="min-width: 800px;">
+                    <t t-foreach="['present', 'late', 'sick', 'unpaid']" t-as="type" t-key="type">
+                        <div class="col-12 col-md-6 col-lg-3">
+                            <div class="card border-0 shadow-sm o_detail_card" style="border-radius: 16px; overflow: hidden; max-height: 500px;">
+                                <div class="card-header border-0 py-3 px-4" t-attf-class="o_detail_header_{{type}}">
+                                    <h6 class="fw-bold mb-0 text-uppercase small text-white" style="letter-spacing: 0.5px;">
+                                        <t t-if="type === 'present'">Present</t>
+                                        <t t-elif="type === 'late'">Late Arrival</t>
+                                        <t t-elif="type === 'sick'">Sick Leave</t>
+                                        <t t-else="">Unpaid Leave</t>
+                                    </h6>
+                                </div>
+                                <div class="card-body p-0" style="overflow-y: auto; max-height: 440px;">
+                                    <t t-foreach="state.data[type].list" t-as="emp" t-key="emp_index">
+                                        <div class="d-flex align-items-center p-3 border-bottom o_detail_row">
+                                            <span class="small me-3 text-muted" style="font-weight: 600; min-width: 25px;"><t t-esc="(emp_index &lt; 9 ? '0' : '') + (emp_index + 1)"/>.</span>
+                                            <div class="flex-grow-1">
+                                                <div class="fw-semibold" style="font-size: 14px;"><t t-esc="emp.name"/></div>
+                                                <div class="text-muted" style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.3px;"><t t-esc="emp.dept"/></div>
+                                            </div>
+                                            <span class="badge rounded-pill px-3 py-2" t-attf-class="o_badge_{{type}}"><t t-esc="emp.pct"/>%</span>
+                                        </div>
+                                    </t>
+                                    <t t-if="!state.data[type].list.length">
+                                        <div class="text-center py-5">
+                                            <p class="text-muted small">Tidak ada data</p>
+                                        </div>
+                                    </t>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </div>
+            </t>
+        </div>
+    </t>
+</templates>

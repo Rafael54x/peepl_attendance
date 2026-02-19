@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="hr_attendance_analytics_action" model="ir.actions.client">
+        <field name="name">Analytics</field>
+        <field name="tag">hr_attendance_analytics</field>
+    </record>
+
+    <menuitem id="menu_hr_attendance_analytics"
+              name="Analytics"
+              parent="hr_attendance.menu_hr_attendance_overview"
+              action="hr_attendance_analytics_action"
+              sequence="1"/>
+</odoo>
