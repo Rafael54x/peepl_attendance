@@ -437,10 +437,21 @@ class HrAttendanceAnalytics extends Component {
 
     onDetailFilterChange(ev) {
         this.state.detailFilter = ev.target.value;
-        if (this.state.detailFilter !== "all") {
+        const now = new Date();
+        
+        if (this.state.detailFilter === 'day') {
+            this.state.detailStartDate = now.toISOString().split('T')[0];
+            this.state.detailEndDate = now.toISOString().split('T')[0];
+        } else if (this.state.detailFilter === 'week') {
+            const weekStart = new Date(now);
+            weekStart.setDate(now.getDate() - 6);
+            this.state.detailStartDate = weekStart.toISOString().split('T')[0];
+            this.state.detailEndDate = now.toISOString().split('T')[0];
+        } else if (this.state.detailFilter !== 'all' && this.state.detailFilter !== 'year' && this.state.detailFilter !== 'month' && this.state.detailFilter !== 'quarter') {
             this.state.detailStartDate = this.getDefaultStartDate(this.state.detailFilter);
             this.state.detailEndDate = this.getDefaultEndDate();
         }
+        
         this.filterEmployeeAttendances();
     }
 
