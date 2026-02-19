@@ -261,3 +261,55 @@ body.o_dark .o_attendance_analytics .o_detail_row:hover,
 .o_dark .o_detail_card {
     background-color: var(--o-view-background-color);
 }
+
+
+/* Collapsible Cards */
+.o_detail_card_body.o_collapsed {
+    max-height: 0 !important;
+    overflow: hidden !important;
+}
+
+.o_detail_card_header {
+    transition: background-color 0.2s ease;
+}
+
+.o_detail_card_header:hover {
+    opacity: 0.9;
+}
+
+/* Mobile Responsive */
+@media (max-width: 767px) {
+    .o_attendance_analytics {
+        padding: 1rem !important;
+    }
+    
+    .o_card_value {
+        font-size: 2rem !important;
+    }
+    
+    .o_detail_card {
+        max-height: none !important;
+    }
+    
+    .o_detail_card_body {
+        max-height: 300px !important;
+    }
+    
+    .o_detail_card_body.o_collapsed {
+        max-height: 0 !important;
+    }
+}
+
+@media (max-width: 575px) {
+    .o_card_value {
+        font-size: 1.75rem !important;
+    }
+    
+    .o_card_icon_bg {
+        padding: 0.5rem !important;
+    }
+    
+    .o_card_icon {
+        font-size: 1.25rem !important;
+    }
+}

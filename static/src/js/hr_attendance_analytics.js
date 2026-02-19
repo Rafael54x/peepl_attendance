@@ -1,6 +1,6 @@
 /** @odoo-module **/
 
-import { Component, useState, onWillStart } from "@odoo/owl";
+import { Component, useState, onWillStart, onMounted, useRef } from "@odoo/owl";
 import { registry } from "@web/core/registry";
 import { useService } from "@web/core/utils/hooks";
 
@@ -9,11 +9,18 @@ class HrAttendanceAnalytics extends Component {
 
     setup() {
         this.orm = useService("orm");
+        this.summaryRefs = {
+            present: useRef("presentValue"),
+            late: useRef("lateValue"),
+            sick: useRef("sickValue"),
+            unpaid: useRef("unpaidValue")
+        };
         this.state = useState({
             loading: true,
             filter: "month",
             startDate: this.getDefaultStartDate("month"),
             endDate: this.getDefaultEndDate(),
+            collapsedCards: {},
             data: {
                 present: { value: "0%", list: [] },
                 late: { value: "0%", list: [] },
@@ -24,6 +31,10 @@ class HrAttendanceAnalytics extends Component {
 
         onWillStart(async () => {
             await this.loadData();
+        });
+
+        onMounted(() => {
+            this.animateCounters();
         });
     }
 
@@ -179,19 +190,51 @@ class HrAttendanceAnalytics extends Component {
         });
 
         // Calculate overall percentages
-        const totalAttendances = attendances.length;
         Object.keys(grouped).forEach(type => {
-            const count = attendances.filter(a => (a.attendance_type || "present") === type).length;
-            const pct = totalAttendances > 0 ? ((count / totalAttendances) * 100).toFixed(2) : "0.00";
-            
             const list = grouped[type]
                 .sort((a, b) => b.pct - a.pct)
-                .slice(0, 8);
+                .slice(0, 10);
 
-            this.state.data[type] = { value: pct + "%", list };
+            const totalPct = list.reduce((sum, emp) => sum + parseFloat(emp.pct), 0);
+            const avgPct = list.length > 0 ? (totalPct / list.length).toFixed(2) : "0.00";
+
+            this.state.data[type] = { value: avgPct + "%", list };
         });
 
         this.state.loading = false;
+        this.animateCounters();
+    }
+
+    animateCounters() {
+        Object.keys(this.summaryRefs).forEach(type => {
+            const ref = this.summaryRefs[type];
+            if (ref.el) {
+                const target = parseFloat(this.state.data[type].value);
+                this.animateValue(ref.el, 0, target, 1000);
+            }
+        });
+    }
+
+    animateValue(element, start, end, duration) {
+        const startTime = performance.now();
+        const animate = (currentTime) => {
+            const elapsed = currentTime - startTime;
+            const progress = Math.min(elapsed / duration, 1);
+            const value = start + (end - start) * this.easeOutQuart(progress);
+            element.textContent = value.toFixed(2) + "%";
+            if (progress < 1) {
+                requestAnimationFrame(animate);
+            }
+        };
+        requestAnimationFrame(animate);
+    }
+
+    easeOutQuart(x) {
+        return 1 - Math.pow(1 - x, 4);
+    }
+
+    toggleCard(type) {
+        this.state.collapsedCards[type] = !this.state.collapsedCards[type];
     }
 }
 
