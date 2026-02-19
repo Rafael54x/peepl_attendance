@@ -22,6 +22,8 @@ class HrAttendanceAnalytics extends Component {
             startDate: new Date().getFullYear() + "-01-01",
             endDate: new Date().getFullYear() + "-12-31",
             selectedYear: new Date().getFullYear(),
+            selectedMonth: new Date().getMonth() + 1,
+            selectedQuarter: Math.floor(new Date().getMonth() / 3) + 1,
             collapsedCards: {},
             view: "dashboard",
             selectedEmployee: null,
@@ -30,6 +32,8 @@ class HrAttendanceAnalytics extends Component {
             detailStartDate: "",
             detailEndDate: "",
             detailSelectedYear: new Date().getFullYear(),
+            detailSelectedMonth: new Date().getMonth() + 1,
+            detailSelectedQuarter: Math.floor(new Date().getMonth() / 3) + 1,
             detailStatusFilter: "all",
             currentPage: 1,
             pageSize: 20,
@@ -56,8 +60,9 @@ class HrAttendanceAnalytics extends Component {
             case "day":
                 return now.toISOString().split('T')[0];
             case "week":
+                const weekEnd = new Date(now);
                 const weekStart = new Date(now);
-                weekStart.setDate(now.getDate() - now.getDay());
+                weekStart.setDate(now.getDate() - 6);
                 return weekStart.toISOString().split('T')[0];
             case "month":
                 return new Date(now.getFullYear(), now.getMonth(), 1).toISOString().split('T')[0];
@@ -100,6 +105,26 @@ class HrAttendanceAnalytics extends Component {
         this.filterEmployeeAttendances();
     }
 
+    onMonthChange() {
+        const year = this.state.selectedYear;
+        const month = String(this.state.selectedMonth).padStart(2, '0');
+        const lastDay = new Date(year, this.state.selectedMonth, 0).getDate();
+        this.state.startDate = `${year}-${month}-01`;
+        this.state.endDate = `${year}-${month}-${lastDay}`;
+        this.loadData();
+    }
+
+    onQuarterChange() {
+        const year = this.state.selectedYear;
+        const quarter = this.state.selectedQuarter;
+        const startMonth = (quarter - 1) * 3 + 1;
+        const endMonth = startMonth + 2;
+        const lastDay = new Date(year, endMonth, 0).getDate();
+        this.state.startDate = `${year}-${String(startMonth).padStart(2, '0')}-01`;
+        this.state.endDate = `${year}-${String(endMonth).padStart(2, '0')}-${lastDay}`;
+        this.loadData();
+    }
+
     onDayChange() {
         this.state.endDate = this.state.startDate;
         this.loadData();
@@ -107,6 +132,26 @@ class HrAttendanceAnalytics extends Component {
 
     onDetailDayChange() {
         this.state.detailEndDate = this.state.detailStartDate;
+        this.filterEmployeeAttendances();
+    }
+
+    onDetailMonthChange() {
+        const year = this.state.detailSelectedYear;
+        const month = String(this.state.detailSelectedMonth).padStart(2, '0');
+        const lastDay = new Date(year, this.state.detailSelectedMonth, 0).getDate();
+        this.state.detailStartDate = `${year}-${month}-01`;
+        this.state.detailEndDate = `${year}-${month}-${lastDay}`;
+        this.filterEmployeeAttendances();
+    }
+
+    onDetailQuarterChange() {
+        const year = this.state.detailSelectedYear;
+        const quarter = this.state.detailSelectedQuarter;
+        const startMonth = (quarter - 1) * 3 + 1;
+        const endMonth = startMonth + 2;
+        const lastDay = new Date(year, endMonth, 0).getDate();
+        this.state.detailStartDate = `${year}-${String(startMonth).padStart(2, '0')}-01`;
+        this.state.detailEndDate = `${year}-${String(endMonth).padStart(2, '0')}-${lastDay}`;
         this.filterEmployeeAttendances();
     }
 

@@ -19,7 +19,7 @@
                     <p class="text-muted mb-0">Employee Attendance &amp; Absence Report</p>
                 </div>
                 <div class="d-flex flex-column flex-sm-row gap-2 align-items-stretch align-items-sm-center w-100 w-md-auto">
-                    <select class="form-select" t-model="state.filter" t-on-change="(ev) => this.onFilterChange(ev)">
+                    <select class="form-select" t-model="state.filter" t-on-change="(ev) => this.onFilterChange(ev)" style="min-width: 90px;">
                         <option value="day">Day</option>
                         <option value="week">Week</option>
                         <option value="month">Month</option>
@@ -28,6 +28,40 @@
                     </select>
                     <t t-if="state.filter === 'year'">
                         <select class="form-control" t-model="state.selectedYear" t-on-change="() => this.onYearChange()">
+                            <t t-foreach="getYearOptions()" t-as="year" t-key="year">
+                                <option t-att-value="year"><t t-esc="year"/></option>
+                            </t>
+                        </select>
+                    </t>
+                    <t t-elif="state.filter === 'month'">
+                        <select class="form-control" t-model="state.selectedMonth" t-on-change="() => this.onMonthChange()" style="min-width: 90px;">
+                            <option value="1">January</option>
+                            <option value="2">February</option>
+                            <option value="3">March</option>
+                            <option value="4">April</option>
+                            <option value="5">May</option>
+                            <option value="6">June</option>
+                            <option value="7">July</option>
+                            <option value="8">August</option>
+                            <option value="9">September</option>
+                            <option value="10">October</option>
+                            <option value="11">November</option>
+                            <option value="12">December</option>
+                        </select>
+                        <select class="form-control" t-model="state.selectedYear" t-on-change="() => this.onMonthChange()">
+                            <t t-foreach="getYearOptions()" t-as="year" t-key="year">
+                                <option t-att-value="year"><t t-esc="year"/></option>
+                            </t>
+                        </select>
+                    </t>
+                    <t t-elif="state.filter === 'quarter'">
+                        <select class="form-control" t-model="state.selectedQuarter" t-on-change="() => this.onQuarterChange()" style="min-width: 120px;">
+                            <option value="1">Q1 (Jan - Mar)</option>
+                            <option value="2">Q2 (Apr - Jun)</option>
+                            <option value="3">Q3 (Jul - Sep)</option>
+                            <option value="4">Q4 (Oct - Dec)</option>
+                        </select>
+                        <select class="form-control" t-model="state.selectedYear" t-on-change="() => this.onQuarterChange()">
                             <t t-foreach="getYearOptions()" t-as="year" t-key="year">
                                 <option t-att-value="year"><t t-esc="year"/></option>
                             </t>
@@ -175,7 +209,7 @@
                     <p class="text-muted mb-0">Employee Attendance Details</p>
                 </div>
                 <div class="d-flex flex-column flex-sm-row gap-2 align-items-stretch align-items-sm-center">
-                    <select class="form-select" t-model="state.detailFilter" t-on-change="(ev) => this.onDetailFilterChange(ev)">
+                    <select class="form-select" t-model="state.detailFilter" t-on-change="(ev) => this.onDetailFilterChange(ev)" style="min-width: 90px;">
                         <option value="all" selected="selected">All Time</option>
                         <option value="day">Day</option>
                         <option value="week">Week</option>
@@ -185,6 +219,40 @@
                     </select>
                     <t t-if="state.detailFilter === 'year'">
                         <select class="form-control" t-model="state.detailSelectedYear" t-on-change="() => this.onDetailYearChange()">
+                            <t t-foreach="getYearOptions()" t-as="year" t-key="year">
+                                <option t-att-value="year"><t t-esc="year"/></option>
+                            </t>
+                        </select>
+                    </t>
+                    <t t-elif="state.detailFilter === 'month'">
+                        <select class="form-control" t-model="state.detailSelectedMonth" t-on-change="() => this.onDetailMonthChange()" style="min-width: 90px;">
+                            <option value="1">January</option>
+                            <option value="2">February</option>
+                            <option value="3">March</option>
+                            <option value="4">April</option>
+                            <option value="5">May</option>
+                            <option value="6">June</option>
+                            <option value="7">July</option>
+                            <option value="8">August</option>
+                            <option value="9">September</option>
+                            <option value="10">October</option>
+                            <option value="11">November</option>
+                            <option value="12">December</option>
+                        </select>
+                        <select class="form-control" t-model="state.detailSelectedYear" t-on-change="() => this.onDetailMonthChange()">
+                            <t t-foreach="getYearOptions()" t-as="year" t-key="year">
+                                <option t-att-value="year"><t t-esc="year"/></option>
+                            </t>
+                        </select>
+                    </t>
+                    <t t-elif="state.detailFilter === 'quarter'">
+                        <select class="form-control" t-model="state.detailSelectedQuarter" t-on-change="() => this.onDetailQuarterChange()" style="min-width: 120px;">
+                            <option value="1">Q1 (Jan - Mar)</option>
+                            <option value="2">Q2 (Apr - Jun)</option>
+                            <option value="3">Q3 (Jul - Sep)</option>
+                            <option value="4">Q4 (Oct - Dec)</option>
+                        </select>
+                        <select class="form-control" t-model="state.detailSelectedYear" t-on-change="() => this.onDetailQuarterChange()">
                             <t t-foreach="getYearOptions()" t-as="year" t-key="year">
                                 <option t-att-value="year"><t t-esc="year"/></option>
                             </t>
