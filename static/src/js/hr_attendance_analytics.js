@@ -6,6 +6,7 @@ import { useService } from "@web/core/utils/hooks";
 
 class HrAttendanceAnalytics extends Component {
     static template = "peepl_attendance.HrAttendanceAnalytics";
+    static props = ["*"];
 
     setup() {
         this.orm = useService("orm");
@@ -17,10 +18,19 @@ class HrAttendanceAnalytics extends Component {
         };
         this.state = useState({
             loading: true,
-            filter: "month",
-            startDate: this.getDefaultStartDate("month"),
+            filter: "year",
+            startDate: this.getDefaultStartDate("year"),
             endDate: this.getDefaultEndDate(),
+            selectedYear: new Date().getFullYear(),
             collapsedCards: {},
+            view: "dashboard",
+            selectedEmployee: null,
+            employeeData: null,
+            detailFilter: "all",
+            detailStartDate: "",
+            detailEndDate: "",
+            detailSelectedYear: new Date().getFullYear(),
+            detailStatusFilter: "all",
             data: {
                 present: { value: "0%", list: [] },
                 late: { value: "0%", list: [] },
@@ -61,6 +71,32 @@ class HrAttendanceAnalytics extends Component {
 
     getDefaultEndDate() {
         return new Date().toISOString().split('T')[0];
+    }
+
+    getYearOptions() {
+        const currentYear = new Date().getFullYear();
+        const years = [];
+        for (let i = currentYear; i >= currentYear - 10; i--) {
+            years.push(i);
+        }
+        return years;
+    }
+
+    onYearChange() {
+        this.state.startDate = this.state.selectedYear + "-01-01";
+        this.state.endDate = this.state.selectedYear + "-12-31";
+        this.loadData();
+    }
+
+    onDetailYearChange() {
+        this.state.detailStartDate = this.state.detailSelectedYear + "-01-01";
+        this.state.detailEndDate = this.state.detailSelectedYear + "-12-31";
+        this.filterEmployeeAttendances();
+    }
+
+    onDetailStatusFilterChange(ev) {
+        this.state.detailStatusFilter = ev.target.value;
+        this.filterEmployeeAttendances();
     }
 
     onFilterChange(ev) {
@@ -145,6 +181,7 @@ class HrAttendanceAnalytics extends Component {
             
             if (!empMap[empId]) {
                 empMap[empId] = {
+                    id: empId,
                     name: empName,
                     dept: empDeptMap[empId] || "No Department",
                     present: 0,
@@ -168,6 +205,7 @@ class HrAttendanceAnalytics extends Component {
         };
 
         Object.values(empMap).forEach(emp => {
+            const empId = Object.keys(empMap).find(key => empMap[key] === emp);
             if (emp.total > 0) {
                 const presentPct = ((emp.present / emp.total) * 100).toFixed(1);
                 const latePct = ((emp.late / emp.total) * 100).toFixed(1);
@@ -175,16 +213,16 @@ class HrAttendanceAnalytics extends Component {
                 const unpaidPct = ((emp.unpaid / emp.total) * 100).toFixed(1);
 
                 if (emp.present > 0) {
-                    grouped.present.push({ name: emp.name, dept: emp.dept, pct: presentPct });
+                    grouped.present.push({ id: empId, name: emp.name, dept: emp.dept, pct: presentPct });
                 }
                 if (emp.late > 0) {
-                    grouped.late.push({ name: emp.name, dept: emp.dept, pct: latePct });
+                    grouped.late.push({ id: empId, name: emp.name, dept: emp.dept, pct: latePct });
                 }
                 if (emp.sick > 0) {
-                    grouped.sick.push({ name: emp.name, dept: emp.dept, pct: sickPct });
+                    grouped.sick.push({ id: empId, name: emp.name, dept: emp.dept, pct: sickPct });
                 }
                 if (emp.unpaid > 0) {
-                    grouped.unpaid.push({ name: emp.name, dept: emp.dept, pct: unpaidPct });
+                    grouped.unpaid.push({ id: empId, name: emp.name, dept: emp.dept, pct: unpaidPct });
                 }
             }
         });
@@ -235,6 +273,101 @@ class HrAttendanceAnalytics extends Component {
 
     toggleCard(type) {
         this.state.collapsedCards[type] = !this.state.collapsedCards[type];
+    }
+
+    async viewEmployeeDetail(empId, empName) {
+        this.state.loading = true;
+        this.state.view = "detail";
+        this.state.selectedEmployee = { id: empId, name: empName };
+
+        const domain = [
+            ["employee_id", "=", parseInt(empId)]
+        ];
+
+        console.log("Fetching attendances for employee ID:", parseInt(empId));
+
+        const attendances = await this.orm.searchRead(
+            "hr.attendance",
+            domain,
+            ["id", "check_in", "check_out", "attendance_type"],
+            { order: "check_in desc" }
+        );
+
+        console.log("Attendances fetched:", attendances);
+
+        const stats = {
+            present: 0,
+            late: 0,
+            sick: 0,
+            unpaid: 0
+        };
+
+        attendances.forEach(att => {
+            const type = att.attendance_type || "present";
+            stats[type]++;
+        });
+
+        this.state.employeeData = {
+            stats,
+            attendances,
+            allAttendances: attendances
+        };
+
+        this.state.loading = false;
+    }
+
+    backToDashboard() {
+        this.state.view = "dashboard";
+        this.state.selectedEmployee = null;
+        this.state.employeeData = null;
+    }
+
+    onDetailFilterChange(ev) {
+        this.state.detailFilter = ev.target.value;
+        if (this.state.detailFilter !== "all") {
+            this.state.detailStartDate = this.getDefaultStartDate(this.state.detailFilter);
+            this.state.detailEndDate = this.getDefaultEndDate();
+        }
+        this.filterEmployeeAttendances();
+    }
+
+    onDetailDateChange() {
+        this.filterEmployeeAttendances();
+    }
+
+    filterEmployeeAttendances() {
+        if (!this.state.employeeData || !this.state.employeeData.allAttendances) return;
+
+        let filtered = this.state.employeeData.allAttendances;
+
+        if (this.state.detailFilter !== "all" && this.state.detailStartDate && this.state.detailEndDate) {
+            filtered = filtered.filter(att => {
+                const attDate = att.check_in.split(' ')[0];
+                return attDate >= this.state.detailStartDate && attDate <= this.state.detailEndDate;
+            });
+        }
+
+        if (this.state.detailStatusFilter !== "all") {
+            filtered = filtered.filter(att => {
+                const type = att.attendance_type || "present";
+                return type === this.state.detailStatusFilter;
+            });
+        }
+
+        const stats = {
+            present: 0,
+            late: 0,
+            sick: 0,
+            unpaid: 0
+        };
+
+        filtered.forEach(att => {
+            const type = att.attendance_type || "present";
+            stats[type]++;
+        });
+
+        this.state.employeeData.attendances = filtered;
+        this.state.employeeData.stats = stats;
     }
 }
 

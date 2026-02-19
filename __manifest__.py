@@ -3,7 +3,7 @@
     'name': 'Peepl Attendance - Attendance',
     'version': '19.0.1.0.7',
     'category': 'Attendance/Projects',
-    'summary': 'Attendance Recruitment services',
+    'summary': 'Attendance Services',
     'description': """
 Attendance System
 ==================================

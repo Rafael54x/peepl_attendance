@@ -313,3 +313,205 @@ body.o_dark .o_attendance_analytics .o_detail_row:hover,
         font-size: 1.25rem !important;
     }
 }
+
+
+/* Attendance Table Styling */
+.o_modern_table {
+    border-collapse: separate;
+    border-spacing: 0;
+}
+
+.o_modern_row {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.o_modern_row:hover {
+    background: linear-gradient(90deg, rgba(52, 152, 219, 0.03) 0%, rgba(155, 89, 182, 0.03) 100%);
+    transform: translateX(4px);
+}
+
+.o_icon_wrapper {
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    background: rgba(149, 165, 166, 0.08);
+    transition: all 0.3s ease;
+}
+
+.o_modern_row:hover .o_icon_wrapper {
+    background: rgba(52, 152, 219, 0.12);
+    transform: scale(1.1);
+}
+
+.o_modern_badge {
+    padding: 6px 16px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0.3px;
+    border: none;
+    text-transform: capitalize;
+}
+
+.o_modern_badge_present {
+    background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+    color: #155724;
+}
+
+.o_modern_badge_late {
+    background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%);
+    color: #856404;
+}
+
+.o_modern_badge_sick {
+    background: linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%);
+    color: #721c24;
+}
+
+.o_modern_badge_unpaid {
+    background: linear-gradient(135deg, #e2e3e5 0%, #d6d8db 100%);
+    color: #383d41;
+}
+
+@media (prefers-color-scheme: dark) {
+    .o_attendance_table_card {
+        background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%) !important;
+        box-shadow: 0 8px 32px rgba(0,0,0,0.4) !important;
+    }
+    
+    .o_attendance_table_card .card-header {
+        background: rgba(23, 21, 46, 0.9) !important;
+    }
+    
+    .o_attendance_table_card h5 {
+        color: #e0e0e0 !important;
+    }
+    
+    .o_modern_table thead tr {
+        background: linear-gradient(135deg, #2a2a2a 0%, #3a3a3a 100%) !important;
+        border-bottom: 2px solid #404040 !important;
+    }
+    
+    .o_modern_table thead th {
+        color: #a0a0a0 !important;
+    }
+    
+    .o_modern_row td {
+        border-bottom: 1px solid #333 !important;
+    }
+    
+    .o_modern_row span {
+        color: #d0d0d0 !important;
+    }
+    
+    .o_icon_wrapper {
+        background: rgba(255, 255, 255, 0.05) !important;
+    }
+    
+    .o_modern_row:hover {
+        background: linear-gradient(90deg, rgba(52, 152, 219, 0.1) 0%, rgba(155, 89, 182, 0.1) 100%) !important;
+    }
+    
+    .o_modern_row:hover .o_icon_wrapper {
+        background: rgba(52, 152, 219, 0.15) !important;
+    }
+    
+    .o_modern_badge_present {
+        background: linear-gradient(135deg, #1e4620 0%, #2d5a2f 100%) !important;
+        color: #90ee90 !important;
+    }
+    
+    .o_modern_badge_late {
+        background: linear-gradient(135deg, #4a3c1a 0%, #5c4a20 100%) !important;
+        color: #ffd700 !important;
+    }
+    
+    .o_modern_badge_sick {
+        background: linear-gradient(135deg, #4a1e1e 0%, #5c2828 100%) !important;
+        color: #ff9999 !important;
+    }
+    
+    .o_modern_badge_unpaid {
+        background: linear-gradient(135deg, #2a2a2a 0%, #3a3a3a 100%) !important;
+        color: #b0b0b0 !important;
+    }
+}
+
+body.o_dark .o_attendance_table_card,
+.o_dark .o_attendance_table_card {
+    background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%) !important;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.4) !important;
+}
+
+body.o_dark .o_attendance_table_card .card-header,
+.o_dark .o_attendance_table_card .card-header {
+    background: rgba(40, 40, 40, 0.9) !important;
+}
+
+body.o_dark .o_attendance_table_card h5,
+.o_dark .o_attendance_table_card h5 {
+    color: #e0e0e0 !important;
+}
+
+body.o_dark .o_modern_table thead tr,
+.o_dark .o_modern_table thead tr {
+    background: linear-gradient(135deg, #2a2a2a 0%, #3a3a3a 100%) !important;
+    border-bottom: 2px solid #404040 !important;
+}
+
+body.o_dark .o_modern_table thead th,
+.o_dark .o_modern_table thead th {
+    color: #a0a0a0 !important;
+}
+
+body.o_dark .o_modern_row td,
+.o_dark .o_modern_row td {
+    border-bottom: 1px solid #333 !important;
+}
+
+body.o_dark .o_modern_row span,
+.o_dark .o_modern_row span {
+    color: #d0d0d0 !important;
+}
+
+body.o_dark .o_icon_wrapper,
+.o_dark .o_icon_wrapper {
+    background: rgba(255, 255, 255, 0.05) !important;
+}
+
+body.o_dark .o_modern_row:hover,
+.o_dark .o_modern_row:hover {
+    background: linear-gradient(90deg, rgba(52, 152, 219, 0.1) 0%, rgba(155, 89, 182, 0.1) 100%) !important;
+}
+
+body.o_dark .o_modern_row:hover .o_icon_wrapper,
+.o_dark .o_modern_row:hover .o_icon_wrapper {
+    background: rgba(52, 152, 219, 0.15) !important;
+}
+
+body.o_dark .o_modern_badge_present,
+.o_dark .o_modern_badge_present {
+    background: linear-gradient(135deg, #1e4620 0%, #2d5a2f 100%) !important;
+    color: #90ee90 !important;
+}
+
+body.o_dark .o_modern_badge_late,
+.o_dark .o_modern_badge_late {
+    background: linear-gradient(135deg, #4a3c1a 0%, #5c4a20 100%) !important;
+    color: #ffd700 !important;
+}
+
+body.o_dark .o_modern_badge_sick,
+.o_dark .o_modern_badge_sick {
+    background: linear-gradient(135deg, #4a1e1e 0%, #5c2828 100%) !important;
+    color: #ff9999 !important;
+}
+
+body.o_dark .o_modern_badge_unpaid,
+.o_dark .o_modern_badge_unpaid {
+    background: linear-gradient(135deg, #2a2a2a 0%, #3a3a3a 100%) !important;
+    color: #b0b0b0 !important;
+}

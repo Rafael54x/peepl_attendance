@@ -2,143 +2,355 @@
 <templates xml:space="preserve">
     <t t-name="peepl_attendance.HrAttendanceAnalytics">
         <div class="o_attendance_analytics p-4 pb-5" style="height: 100vh; overflow-y: auto;">
-                <div class="mb-4">
-                    <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center mb-3 gap-3">
-                        <div>
-                            <h1 class="fs-3 fw-bold mb-1">HR Analytics Attendance Dashboard</h1>
-                            <p class="text-muted mb-0">Laporan Kehadiran &amp; Absensi Karyawan</p>
-                        </div>
-                        <div class="d-flex flex-column flex-sm-row gap-2 align-items-stretch align-items-sm-center w-100 w-md-auto">
-                            <select class="form-select" t-model="state.filter" t-on-change="(ev) => this.onFilterChange(ev)">
-                                <option value="day">Day</option>
-                                <option value="week">Week</option>
-                                <option value="month" selected="selected">Month</option>
-                                <option value="quarter">Quarter</option>
-                                <option value="year">Year</option>
-                            </select>
-                            <input type="date" class="form-control" t-model="state.startDate" t-on-change="() => this.onDateChange()"/>
-                            <span class="text-muted align-self-center d-none d-sm-inline">to</span>
-                            <input type="date" class="form-control" t-model="state.endDate" t-on-change="() => this.onDateChange()"/>
-                        </div>
-                    </div>
-                </div>
-
-            <t t-if="state.loading">
-                <div class="text-center py-5">
-                    <i class="fa fa-spinner fa-spin fa-3x text-primary"/>
-                    <p class="mt-3 text-muted">Memuat data...</p>
-                </div>
+            <t t-if="state.view === 'dashboard'">
+                <t t-call="peepl_attendance.Dashboard"/>
             </t>
-
-            <t t-else="">
-                <!-- Summary Cards -->
-                <div class="row g-3 g-md-4 mb-5">
-                    <div class="col-12 col-sm-6 col-lg-3">
-                        <div class="card border-0 shadow-sm h-100 o_card_present">
-                            <div class="card-body p-4">
-                                <div class="d-flex justify-content-between align-items-start">
-                                    <div>
-                                        <p class="fw-bold small mb-2 o_card_label">TOTAL PRESENT</p>
-                                        <h2 class="fw-bold mb-0 o_card_value" t-ref="presentValue"><t t-esc="state.data.present.value"/></h2>
-                                        <p class="small mt-2 mb-0 o_card_desc">Karyawan Hadir Tepat Waktu</p>
-                                    </div>
-                                    <div class="p-3 rounded-circle o_card_icon_bg">
-                                        <i class="fa fa-check o_card_icon"/>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="col-12 col-sm-6 col-lg-3">
-                        <div class="card border-0 shadow-sm h-100 o_card_late">
-                            <div class="card-body p-4">
-                                <div class="d-flex justify-content-between align-items-start">
-                                    <div>
-                                        <p class="fw-bold small mb-2 o_card_label">TOTAL LATE ARRIVAL</p>
-                                        <h2 class="fw-bold mb-0 o_card_value" t-ref="lateValue"><t t-esc="state.data.late.value"/></h2>
-                                        <p class="small mt-2 mb-0 o_card_desc">Keterlambatan Masuk</p>
-                                    </div>
-                                    <div class="p-3 rounded-circle o_card_icon_bg">
-                                        <i class="fa fa-clock-o o_card_icon"/>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="col-12 col-sm-6 col-lg-3">
-                        <div class="card border-0 shadow-sm h-100 o_card_sick">
-                            <div class="card-body p-4">
-                                <div class="d-flex justify-content-between align-items-start">
-                                    <div>
-                                        <p class="fw-bold small mb-2 o_card_label">TOTAL SICK LEAVE</p>
-                                        <h2 class="fw-bold mb-0 o_card_value" t-ref="sickValue"><t t-esc="state.data.sick.value"/></h2>
-                                        <p class="small mt-2 mb-0 o_card_desc">Izin Sakit</p>
-                                    </div>
-                                    <div class="p-3 rounded-circle o_card_icon_bg">
-                                        <i class="fa fa-medkit o_card_icon"/>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="col-12 col-sm-6 col-lg-3">
-                        <div class="card border-0 shadow-sm h-100 o_card_unpaid">
-                            <div class="card-body p-4">
-                                <div class="d-flex justify-content-between align-items-start">
-                                    <div>
-                                        <p class="fw-bold small mb-2 o_card_label">TOTAL UNPAID LEAVE</p>
-                                        <h2 class="fw-bold mb-0 o_card_value" t-ref="unpaidValue"><t t-esc="state.data.unpaid.value"/></h2>
-                                        <p class="small mt-2 mb-0 o_card_desc">Cuti Tanpa Tanggungan</p>
-                                    </div>
-                                    <div class="p-3 rounded-circle o_card_icon_bg">
-                                        <i class="fa fa-exclamation-circle o_card_icon"/>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Detail Lists -->
-                <h3 class="fs-5 fw-semibold mb-3">Detail Karyawan</h3>
-                <div class="row g-4 mb-5">
-                    <t t-foreach="['present', 'late', 'sick', 'unpaid']" t-as="type" t-key="type">
-                        <div class="col-12 col-md-6 col-xl-3">
-                            <div class="card border-0 shadow-sm o_detail_card" style="border-radius: 16px; overflow: hidden;">
-                                <div class="card-header border-0 py-3 px-4 d-flex justify-content-between align-items-center" t-attf-class="o_detail_header_{{type}}" t-on-click="() => this.toggleCard(type)" style="cursor: pointer;">
-                                    <h6 class="fw-bold mb-0 text-uppercase small text-white" style="letter-spacing: 0.5px;">
-                                        <t t-if="type === 'present'">Present</t>
-                                        <t t-elif="type === 'late'">Late Arrival</t>
-                                        <t t-elif="type === 'sick'">Sick Leave</t>
-                                        <t t-else="">Unpaid Leave</t>
-                                    </h6>
-                                    <i class="fa text-white" t-attf-class="{{state.collapsedCards[type] ? 'fa-chevron-down' : 'fa-chevron-up'}}"/>
-                                </div>
-                                <div class="card-body p-0 o_detail_card_body" t-attf-class="{{state.collapsedCards[type] ? 'o_collapsed' : ''}}" style="overflow-y: auto; max-height: 440px; transition: max-height 0.3s ease;">
-                                    <t t-foreach="state.data[type].list" t-as="emp" t-key="emp_index">
-                                        <div class="d-flex align-items-center p-3 border-bottom o_detail_row">
-                                            <span class="small me-3 text-muted" style="font-weight: 600; min-width: 25px;"><t t-esc="(emp_index &lt; 9 ? '0' : '') + (emp_index + 1)"/>.</span>
-                                            <div class="flex-grow-1">
-                                                <div class="fw-semibold" style="font-size: 14px;"><t t-esc="emp.name"/></div>
-                                                <div class="text-muted" style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.3px;"><t t-esc="emp.dept"/></div>
-                                            </div>
-                                            <span class="badge rounded-pill px-3 py-2" t-attf-class="o_badge_{{type}}"><t t-esc="emp.pct"/>%</span>
-                                        </div>
-                                    </t>
-                                    <t t-if="!state.data[type].list.length">
-                                        <div class="text-center py-5">
-                                            <p class="text-muted small">Tidak ada data</p>
-                                        </div>
-                                    </t>
-                                </div>
-                            </div>
-                        </div>
-                    </t>
-                </div>
+            <t t-elif="state.view === 'detail'">
+                <t t-call="peepl_attendance.EmployeeDetail"/>
             </t>
         </div>
+    </t>
+
+    <t t-name="peepl_attendance.Dashboard">
+        <div class="mb-4">
+            <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center mb-3 gap-3">
+                <div>
+                    <h1 class="fs-3 fw-bold mb-1">HR Analytics Attendance Dashboard</h1>
+                    <p class="text-muted mb-0">Laporan Kehadiran &amp; Absensi Karyawan</p>
+                </div>
+                <div class="d-flex flex-column flex-sm-row gap-2 align-items-stretch align-items-sm-center w-100 w-md-auto">
+                    <select class="form-select" t-model="state.filter" t-on-change="(ev) => this.onFilterChange(ev)">
+                        <option value="day">Day</option>
+                        <option value="week">Week</option>
+                        <option value="month">Month</option>
+                        <option value="quarter">Quarter</option>
+                        <option value="year" selected="selected">Year</option>
+                    </select>
+                    <t t-if="state.filter === 'year'">
+                        <select class="form-control" t-model="state.selectedYear" t-on-change="() => this.onYearChange()">
+                            <t t-foreach="getYearOptions()" t-as="year" t-key="year">
+                                <option t-att-value="year"><t t-esc="year"/></option>
+                            </t>
+                        </select>
+                    </t>
+                    <t t-else="">
+                        <input type="date" class="form-control" t-model="state.startDate" t-on-change="() => this.onDateChange()"/>
+                        <span class="text-muted align-self-center d-none d-sm-inline">to</span>
+                        <input type="date" class="form-control" t-model="state.endDate" t-on-change="() => this.onDateChange()"/>
+                    </t>
+                </div>
+            </div>
+        </div>
+
+        <t t-if="state.loading">
+            <div class="text-center py-5">
+                <i class="fa fa-spinner fa-spin fa-3x text-primary"/>
+                <p class="mt-3 text-muted">Memuat data...</p>
+            </div>
+        </t>
+
+        <t t-else="">
+            <!-- Summary Cards -->
+            <div class="row g-3 g-md-4 mb-5">
+                <div class="col-12 col-sm-6 col-lg-3">
+                    <div class="card border-0 shadow-sm h-100 o_card_present">
+                        <div class="card-body p-4">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div>
+                                    <p class="fw-bold small mb-2 o_card_label">TOTAL PRESENT</p>
+                                    <h2 class="fw-bold mb-0 o_card_value" t-ref="presentValue"><t t-esc="state.data.present.value"/></h2>
+                                    <p class="small mt-2 mb-0 o_card_desc">Karyawan Hadir Tepat Waktu</p>
+                                </div>
+                                <div class="p-3 rounded-circle o_card_icon_bg">
+                                    <i class="fa fa-check o_card_icon"/>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-12 col-sm-6 col-lg-3">
+                    <div class="card border-0 shadow-sm h-100 o_card_late">
+                        <div class="card-body p-4">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div>
+                                    <p class="fw-bold small mb-2 o_card_label">TOTAL LATE ARRIVAL</p>
+                                    <h2 class="fw-bold mb-0 o_card_value" t-ref="lateValue"><t t-esc="state.data.late.value"/></h2>
+                                    <p class="small mt-2 mb-0 o_card_desc">Keterlambatan Masuk</p>
+                                </div>
+                                <div class="p-3 rounded-circle o_card_icon_bg">
+                                    <i class="fa fa-clock-o o_card_icon"/>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-12 col-sm-6 col-lg-3">
+                    <div class="card border-0 shadow-sm h-100 o_card_sick">
+                        <div class="card-body p-4">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div>
+                                    <p class="fw-bold small mb-2 o_card_label">TOTAL SICK LEAVE</p>
+                                    <h2 class="fw-bold mb-0 o_card_value" t-ref="sickValue"><t t-esc="state.data.sick.value"/></h2>
+                                    <p class="small mt-2 mb-0 o_card_desc">Izin Sakit</p>
+                                </div>
+                                <div class="p-3 rounded-circle o_card_icon_bg">
+                                    <i class="fa fa-medkit o_card_icon"/>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-12 col-sm-6 col-lg-3">
+                    <div class="card border-0 shadow-sm h-100 o_card_unpaid">
+                        <div class="card-body p-4">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div>
+                                    <p class="fw-bold small mb-2 o_card_label">TOTAL UNPAID LEAVE</p>
+                                    <h2 class="fw-bold mb-0 o_card_value" t-ref="unpaidValue"><t t-esc="state.data.unpaid.value"/></h2>
+                                    <p class="small mt-2 mb-0 o_card_desc">Cuti Tanpa Tanggungan</p>
+                                </div>
+                                <div class="p-3 rounded-circle o_card_icon_bg">
+                                    <i class="fa fa-exclamation-circle o_card_icon"/>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Detail Lists -->
+            <h3 class="fs-5 fw-semibold mb-3">Detail Karyawan</h3>
+            <div class="row g-4 mb-5">
+                <t t-foreach="['present', 'late', 'sick', 'unpaid']" t-as="type" t-key="type">
+                    <div class="col-12 col-md-6 col-xl-3">
+                        <div class="card border-0 shadow-sm o_detail_card" style="border-radius: 16px; overflow: hidden;">
+                            <div class="card-header border-0 py-3 px-4 d-flex justify-content-between align-items-center" t-attf-class="o_detail_header_{{type}}" t-on-click="() => this.toggleCard(type)" style="cursor: pointer;">
+                                <h6 class="fw-bold mb-0 text-uppercase small text-white" style="letter-spacing: 0.5px;">
+                                    <t t-if="type === 'present'">Present</t>
+                                    <t t-elif="type === 'late'">Late Arrival</t>
+                                    <t t-elif="type === 'sick'">Sick Leave</t>
+                                    <t t-else="">Unpaid Leave</t>
+                                </h6>
+                                <i class="fa text-white" t-attf-class="{{state.collapsedCards[type] ? 'fa-chevron-down' : 'fa-chevron-up'}}"/>
+                            </div>
+                            <div class="card-body p-0 o_detail_card_body" t-attf-class="{{state.collapsedCards[type] ? 'o_collapsed' : ''}}" style="overflow-y: auto; max-height: 440px; transition: max-height 0.3s ease;">
+                                <t t-foreach="state.data[type].list" t-as="emp" t-key="emp_index">
+                                    <div class="d-flex align-items-center p-3 border-bottom o_detail_row" t-on-click="() => this.viewEmployeeDetail(emp.id, emp.name)">
+                                        <span class="small me-3 text-muted" style="font-weight: 600; min-width: 25px;"><t t-esc="(emp_index &lt; 9 ? '0' : '') + (emp_index + 1)"/>.</span>
+                                        <div class="flex-grow-1">
+                                            <div class="fw-semibold" style="font-size: 14px;"><t t-esc="emp.name"/></div>
+                                            <div class="text-muted" style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.3px;"><t t-esc="emp.dept"/></div>
+                                        </div>
+                                        <span class="badge rounded-pill px-3 py-2" t-attf-class="o_badge_{{type}}"><t t-esc="emp.pct"/>%</span>
+                                    </div>
+                                </t>
+                                <t t-if="!state.data[type].list.length">
+                                    <div class="text-center py-5">
+                                        <p class="text-muted small">Tidak ada data</p>
+                                    </div>
+                                </t>
+                            </div>
+                        </div>
+                    </div>
+                </t>
+            </div>
+        </t>
+    </t>
+
+    <t t-name="peepl_attendance.EmployeeDetail">
+        <div class="mb-4">
+            <button class="btn btn-link p-0 mb-3" t-on-click="() => this.backToDashboard()">
+                <i class="fa fa-arrow-left me-2"/>
+                Back to Dashboard
+            </button>
+            <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center gap-3">
+                <div>
+                    <h1 class="fs-3 fw-bold mb-1"><t t-esc="state.selectedEmployee.name"/></h1>
+                    <p class="text-muted mb-0">Detail Kehadiran Karyawan</p>
+                </div>
+                <div class="d-flex flex-column flex-sm-row gap-2 align-items-stretch align-items-sm-center">
+                    <select class="form-select" t-model="state.detailFilter" t-on-change="(ev) => this.onDetailFilterChange(ev)">
+                        <option value="all" selected="selected">All Time</option>
+                        <option value="day">Day</option>
+                        <option value="week">Week</option>
+                        <option value="month">Month</option>
+                        <option value="quarter">Quarter</option>
+                        <option value="year">Year</option>
+                    </select>
+                    <t t-if="state.detailFilter === 'year'">
+                        <select class="form-control" t-model="state.detailSelectedYear" t-on-change="() => this.onDetailYearChange()">
+                            <t t-foreach="getYearOptions()" t-as="year" t-key="year">
+                                <option t-att-value="year"><t t-esc="year"/></option>
+                            </t>
+                        </select>
+                    </t>
+                    <t t-elif="state.detailFilter !== 'all'">
+                        <input type="date" class="form-control" t-model="state.detailStartDate" t-on-change="() => this.onDetailDateChange()"/>
+                        <span class="text-muted align-self-center d-none d-sm-inline">to</span>
+                        <input type="date" class="form-control" t-model="state.detailEndDate" t-on-change="() => this.onDetailDateChange()"/>
+                    </t>
+                </div>
+            </div>
+        </div>
+
+        <t t-if="state.loading">
+            <div class="text-center py-5">
+                <i class="fa fa-spinner fa-spin fa-3x text-primary"/>
+                <p class="mt-3 text-muted">Memuat data...</p>
+            </div>
+        </t>
+
+        <t t-else="">
+            <!-- Summary Cards -->
+            <div class="row g-3 g-md-4 mb-4">
+                <div class="col-12 col-sm-6 col-lg-3">
+                    <div class="card border-0 shadow-sm h-100 o_card_present">
+                        <div class="card-body p-4">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div>
+                                    <p class="fw-bold small mb-2 o_card_label">TOTAL PRESENT</p>
+                                    <h2 class="fw-bold mb-0 o_card_value"><t t-esc="state.employeeData.stats.present"/></h2>
+                                    <p class="small mt-2 mb-0 o_card_desc">Hadir Tepat Waktu</p>
+                                </div>
+                                <div class="p-3 rounded-circle o_card_icon_bg">
+                                    <i class="fa fa-check o_card_icon"/>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-12 col-sm-6 col-lg-3">
+                    <div class="card border-0 shadow-sm h-100 o_card_late">
+                        <div class="card-body p-4">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div>
+                                    <p class="fw-bold small mb-2 o_card_label">TOTAL LATE ARRIVAL</p>
+                                    <h2 class="fw-bold mb-0 o_card_value"><t t-esc="state.employeeData.stats.late"/></h2>
+                                    <p class="small mt-2 mb-0 o_card_desc">Keterlambatan</p>
+                                </div>
+                                <div class="p-3 rounded-circle o_card_icon_bg">
+                                    <i class="fa fa-clock-o o_card_icon"/>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-12 col-sm-6 col-lg-3">
+                    <div class="card border-0 shadow-sm h-100 o_card_sick">
+                        <div class="card-body p-4">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div>
+                                    <p class="fw-bold small mb-2 o_card_label">TOTAL SICK LEAVE</p>
+                                    <h2 class="fw-bold mb-0 o_card_value"><t t-esc="state.employeeData.stats.sick"/></h2>
+                                    <p class="small mt-2 mb-0 o_card_desc">Izin Sakit</p>
+                                </div>
+                                <div class="p-3 rounded-circle o_card_icon_bg">
+                                    <i class="fa fa-medkit o_card_icon"/>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-12 col-sm-6 col-lg-3">
+                    <div class="card border-0 shadow-sm h-100 o_card_unpaid">
+                        <div class="card-body p-4">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div>
+                                    <p class="fw-bold small mb-2 o_card_label">TOTAL UNPAID LEAVE</p>
+                                    <h2 class="fw-bold mb-0 o_card_value"><t t-esc="state.employeeData.stats.unpaid"/></h2>
+                                    <p class="small mt-2 mb-0 o_card_desc">Cuti Tanpa Tanggungan</p>
+                                </div>
+                                <div class="p-3 rounded-circle o_card_icon_bg">
+                                    <i class="fa fa-exclamation-circle o_card_icon"/>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Attendance Table -->
+            <div class="card border-0 o_attendance_table_card mb-5" style="border-radius: 20px; overflow: hidden; background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%); box-shadow: 0 8px 32px rgba(0,0,0,0.08);">
+                <div class="card-header border-0 py-4 px-4 d-flex justify-content-between align-items-center" style="background: rgba(255,255,255,0.9); backdrop-filter: blur(10px);">
+                    <h5 class="fw-bold mb-0" style="color: #2c3e50; letter-spacing: -0.5px;">Attendance History</h5>
+                    <select class="form-select" t-model="state.detailStatusFilter" t-on-change="(ev) => this.onDetailStatusFilterChange(ev)" style="width: auto; border-radius: 12px; border: 1px solid #dee2e6; font-size: 14px;">
+                        <option value="all">All Status</option>
+                        <option value="present">Present</option>
+                        <option value="late">Late</option>
+                        <option value="sick">Sick</option>
+                        <option value="unpaid">Unpaid</option>
+                    </select>
+                </div>
+                <div class="card-body p-0">
+                    <div style="overflow: hidden;">
+                        <table class="table mb-0 o_modern_table">
+                            <thead>
+                                <tr style="background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%); border-bottom: 2px solid #dee2e6;">
+                                    <th class="px-4 py-3 fw-semibold" style="font-size: 11px; letter-spacing: 1px; color: #6c757d; text-transform: uppercase; border: none;">Date</th>
+                                    <th class="px-4 py-3 fw-semibold" style="font-size: 11px; letter-spacing: 1px; color: #6c757d; text-transform: uppercase; border: none;">Clock In</th>
+                                    <th class="px-4 py-3 fw-semibold" style="font-size: 11px; letter-spacing: 1px; color: #6c757d; text-transform: uppercase; border: none;">Clock Out</th>
+                                    <th class="px-4 py-3 fw-semibold" style="font-size: 11px; letter-spacing: 1px; color: #6c757d; text-transform: uppercase; border: none;">Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <t t-foreach="state.employeeData.attendances" t-as="att" t-key="att.id">
+                                    <tr class="o_modern_row">
+                                        <td class="px-4 py-3" style="border: none; border-bottom: 1px solid #f0f0f0;">
+                                            <div class="d-flex align-items-center">
+                                                <div class="o_icon_wrapper me-3">
+                                                    <i class="fa fa-calendar-o" style="color: #95a5a6; font-size: 13px;"/>
+                                                </div>
+                                                <span style="color: #2c3e50; font-weight: 500; font-size: 14px;"><t t-esc="att.check_in.split(' ')[0]"/></span>
+                                            </div>
+                                        </td>
+                                        <td class="px-4 py-3" style="border: none; border-bottom: 1px solid #f0f0f0;">
+                                            <div class="d-flex align-items-center">
+                                                <div class="o_icon_wrapper me-3">
+                                                    <i class="fa fa-arrow-right" style="color: #27ae60; font-size: 13px;"/>
+                                                </div>
+                                                <span style="color: #34495e; font-size: 14px;"><t t-esc="att.check_in.split(' ')[1].substring(0, 5)"/></span>
+                                            </div>
+                                        </td>
+                                        <td class="px-4 py-3" style="border: none; border-bottom: 1px solid #f0f0f0;">
+                                            <div class="d-flex align-items-center">
+                                                <div class="o_icon_wrapper me-3">
+                                                    <i class="fa fa-arrow-left" style="color: #e74c3c; font-size: 13px;"/>
+                                                </div>
+                                                <span style="color: #34495e; font-size: 14px;"><t t-esc="att.check_out ? att.check_out.split(' ')[1].substring(0, 5) : '-'"/></span>
+                                            </div>
+                                        </td>
+                                        <td class="px-4 py-3" style="border: none; border-bottom: 1px solid #f0f0f0;">
+                                            <span class="badge o_modern_badge" t-attf-class="o_modern_badge_{{att.attendance_type || 'present'}}">
+                                                <t t-if="att.attendance_type === 'present'">Present</t>
+                                                <t t-elif="att.attendance_type === 'late'">Late</t>
+                                                <t t-elif="att.attendance_type === 'sick'">Sick</t>
+                                                <t t-elif="att.attendance_type === 'unpaid'">Unpaid</t>
+                                                <t t-else="">Present</t>
+                                            </span>
+                                        </td>
+                                    </tr>
+                                </t>
+                                <t t-if="!state.employeeData.attendances.length">
+                                    <tr>
+                                        <td colspan="4" class="text-center py-5" style="border: none;">
+                                            <div style="opacity: 0.4;">
+                                                <i class="fa fa-inbox fa-3x mb-3" style="color: #95a5a6;"/>
+                                                <p class="mb-0" style="color: #7f8c8d; font-size: 14px;">No attendance records found</p>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </t>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </t>
     </t>
 </templates>
