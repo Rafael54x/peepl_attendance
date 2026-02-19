@@ -162,16 +162,55 @@
     background-color: #b91c1c;
 }
 
+.o_detail_header_present h6,
+.o_detail_header_late h6,
+.o_detail_header_sick h6,
+.o_detail_header_unpaid h6 {
+    color: #ffffff !important;
+}
+
 /* Detail Cards Rows */
 .o_detail_row {
-    transition: all 0.3s ease;
+    transition: all 0.2s ease;
     cursor: pointer;
+    border-left: 3px solid transparent;
 }
 
 .o_detail_row:hover {
-    background-color: var(--o-view-background-color, #f8f9fa) !important;
-    transform: translateX(4px);
-    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    border-left-width: 4px;
+}
+
+.o_attendance_analytics .o_detail_row:hover {
+    background-color: #f8f9fa !important;
+}
+
+/* Dark mode support - multiple selectors */
+body.o_dark .o_attendance_analytics .o_detail_row:hover,
+.o_dark .o_attendance_analytics .card-body .o_detail_row:hover,
+[data-color-scheme="dark"] .o_attendance_analytics .o_detail_row:hover {
+    background-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+@media (prefers-color-scheme: dark) {
+    .o_attendance_analytics .o_detail_row:hover {
+        background-color: rgba(255, 255, 255, 0.08) !important;
+    }
+}
+
+.o_detail_row:hover .fw-semibold {
+    color: var(--o-brand-primary, #017e84) !important;
+}
+
+.o_detail_row:hover .o_badge_present,
+.o_detail_row:hover .o_badge_late,
+.o_detail_row:hover .o_badge_sick,
+.o_detail_row:hover .o_badge_unpaid {
+    transform: scale(1.1);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+}
+
+.o_detail_row .badge {
+    transition: all 0.3s ease;
 }
 
 /* Badges */

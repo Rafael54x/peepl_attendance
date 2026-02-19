@@ -10,7 +10,7 @@ Attendance System
 
     """,
     'author': 'Peepl',
-    'website': 'https://peepl.com',
+    'website': 'https://peepl.tech',
     'license': 'LGPL-3',
     'depends': ['base', 'hr_attendance'],
     'data': [

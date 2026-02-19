@@ -4,14 +4,6 @@
         <field name="context">{}</field>
     </record>
 
-    <record id="hr_attendance_management_action" model="ir.actions.act_window">
-        <field name="name">Management</field>
-        <field name="res_model">hr.attendance</field>
-        <field name="view_mode">list</field>
-        <field name="view_id" ref="view_attendance_tree_management_custom"/>
-        <field name="context">{}</field>
-    </record>
-
     <record id="view_attendance_tree_management_custom" model="ir.ui.view">
         <field name="name">hr.attendance.list.custom</field>
         <field name="model">hr.attendance</field>
@@ -33,6 +25,14 @@
                 </list>
             </xpath>
         </field>
+    </record>
+
+    <record id="hr_attendance_management_action" model="ir.actions.act_window">
+        <field name="name">Management</field>
+        <field name="res_model">hr.attendance</field>
+        <field name="view_mode">list</field>
+        <field name="view_id" ref="view_attendance_tree_management_custom"/>
+        <field name="context">{}</field>
     </record>
 
     <!-- Form View -->

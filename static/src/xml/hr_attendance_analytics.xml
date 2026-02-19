@@ -3,8 +3,24 @@
     <t t-name="peepl_attendance.HrAttendanceAnalytics">
         <div class="o_attendance_analytics p-4 pb-5" style="height: 100vh; overflow-y: auto;">
             <div class="mb-4">
-                <h1 class="fs-3 fw-bold">HR Analytics Dashboard</h1>
-                <p class="text-muted">Laporan Kehadiran &amp; Absensi Karyawan</p>
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <div>
+                        <h1 class="fs-3 fw-bold mb-1">HR Analytics Attendance Dashboard</h1>
+                        <p class="text-muted mb-0">Laporan Kehadiran &amp; Absensi Karyawan</p>
+                    </div>
+                    <div class="d-flex gap-2 align-items-center">
+                        <select class="form-select" t-model="state.filter" t-on-change="(ev) => this.onFilterChange(ev)" style="width: auto;">
+                            <option value="day">Day</option>
+                            <option value="week">Week</option>
+                            <option value="month" selected="selected">Month</option>
+                            <option value="quarter">Quarter</option>
+                            <option value="year">Year</option>
+                        </select>
+                        <input type="date" class="form-control" t-model="state.startDate" t-on-change="() => this.onDateChange()" style="width: auto;"/>
+                        <span class="text-muted">to</span>
+                        <input type="date" class="form-control" t-model="state.endDate" t-on-change="() => this.onDateChange()" style="width: auto;"/>
+                    </div>
+                </div>
             </div>
 
             <t t-if="state.loading">
