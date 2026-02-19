@@ -55,6 +55,16 @@ class HrAttendance(models.Model):
             else:
                 record.color = 10  # green
 
+    @api.onchange('check_in')
+    def _onchange_check_in(self):
+        if self.check_in and self.attendance_type not in ['sick', 'unpaid']:
+            user_tz = pytz.timezone(self.env.user.tz or 'UTC')
+            check_in_local = pytz.utc.localize(self.check_in).astimezone(user_tz)
+            if check_in_local.time() >= time(8, 1):
+                self.attendance_type = 'late'
+            else:
+                self.attendance_type = 'present'
+
     @api.onchange('attendance_type')
     def _onchange_attendance_type(self):
         if self.attendance_type in ['sick', 'unpaid']:
@@ -69,11 +79,17 @@ class HrAttendance(models.Model):
             
             self.check_in = local_check_in.astimezone(pytz.utc).replace(tzinfo=None)
             self.check_out = local_check_out.astimezone(pytz.utc).replace(tzinfo=None)
-        elif self.attendance_type == 'present' and self.check_in:
-            user_tz = pytz.timezone(self.env.user.tz or 'UTC')
-            check_in_local = pytz.utc.localize(self.check_in).astimezone(user_tz)
-            if check_in_local.time() >= time(8, 1):
-                self.attendance_type = 'late'
+
+    def _check_late_arrival(self):
+        """Check if attendance should be marked as late based on check_in time"""
+        user_tz = pytz.timezone(self.env.user.tz or 'UTC')
+        for record in self:
+            if record.check_in and record.attendance_type not in ['sick', 'unpaid']:
+                check_in_local = pytz.utc.localize(record.check_in).astimezone(user_tz)
+                if check_in_local.time() >= time(8, 1):
+                    record.attendance_type = 'late'
+                elif record.attendance_type == 'late' and check_in_local.time() < time(8, 1):
+                    record.attendance_type = 'present'
 
     @api.model_create_multi
     def create(self, vals_list):
@@ -96,32 +112,7 @@ class HrAttendance(models.Model):
         return super().create(vals_list)
 
     def write(self, vals):
-        user_tz = pytz.timezone(self.env.user.tz or 'UTC')
-        if vals.get('attendance_type') in ['sick', 'unpaid']:
-            for record in self:
-                if record.check_in:
-                    local_date = pytz.utc.localize(record.check_in).astimezone(user_tz).date()
-                else:
-                    local_date = datetime.now(user_tz).date()
-                
-                local_check_in = user_tz.localize(datetime.combine(local_date, time(8, 0)))
-                local_check_out = user_tz.localize(datetime.combine(local_date, time(17, 0)))
-                
-                vals['check_in'] = local_check_in.astimezone(pytz.utc).replace(tzinfo=None)
-                vals['check_out'] = local_check_out.astimezone(pytz.utc).replace(tzinfo=None)
-                break
-        elif vals.get('attendance_type') == 'present':
-            for record in self:
-                if record.check_in:
-                    check_in_local = pytz.utc.localize(record.check_in).astimezone(user_tz)
-                    if check_in_local.time() >= time(8, 1):
-                        vals['attendance_type'] = 'late'
-                break
-        elif 'check_in' in vals and 'attendance_type' not in vals:
-            check_in_utc = fields.Datetime.from_string(vals['check_in'])
-            check_in_local = pytz.utc.localize(check_in_utc).astimezone(user_tz)
-            if check_in_local.time() >= time(8, 1):
-                vals['attendance_type'] = 'late'
-            else:
-                vals['attendance_type'] = 'present'
-        return super().write(vals)
+        result = super().write(vals)
+        if 'check_in' in vals or 'check_out' in vals:
+            self._check_late_arrival()
+        return result

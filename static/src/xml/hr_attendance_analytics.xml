@@ -16,7 +16,7 @@
             <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center mb-3 gap-3">
                 <div>
                     <h1 class="fs-3 fw-bold mb-1">HR Analytics Attendance Dashboard</h1>
-                    <p class="text-muted mb-0">Laporan Kehadiran &amp; Absensi Karyawan</p>
+                    <p class="text-muted mb-0">Employee Attendance &amp; Absence Report</p>
                 </div>
                 <div class="d-flex flex-column flex-sm-row gap-2 align-items-stretch align-items-sm-center w-100 w-md-auto">
                     <select class="form-select" t-model="state.filter" t-on-change="(ev) => this.onFilterChange(ev)">
@@ -45,7 +45,7 @@
         <t t-if="state.loading">
             <div class="text-center py-5">
                 <i class="fa fa-spinner fa-spin fa-3x text-primary"/>
-                <p class="mt-3 text-muted">Memuat data...</p>
+                <p class="mt-3 text-muted">Loading Data...</p>
             </div>
         </t>
 
@@ -59,7 +59,7 @@
                                 <div>
                                     <p class="fw-bold small mb-2 o_card_label">TOTAL PRESENT</p>
                                     <h2 class="fw-bold mb-0 o_card_value" t-ref="presentValue"><t t-esc="state.data.present.value"/></h2>
-                                    <p class="small mt-2 mb-0 o_card_desc">Karyawan Hadir Tepat Waktu</p>
+                                    <p class="small mt-2 mb-0 o_card_desc">Employees Arrive on Time</p>
                                 </div>
                                 <div class="p-3 rounded-circle o_card_icon_bg">
                                     <i class="fa fa-check o_card_icon"/>
@@ -76,7 +76,7 @@
                                 <div>
                                     <p class="fw-bold small mb-2 o_card_label">TOTAL LATE ARRIVAL</p>
                                     <h2 class="fw-bold mb-0 o_card_value" t-ref="lateValue"><t t-esc="state.data.late.value"/></h2>
-                                    <p class="small mt-2 mb-0 o_card_desc">Keterlambatan Masuk</p>
+                                    <p class="small mt-2 mb-0 o_card_desc">Late</p>
                                 </div>
                                 <div class="p-3 rounded-circle o_card_icon_bg">
                                     <i class="fa fa-clock-o o_card_icon"/>
@@ -93,7 +93,7 @@
                                 <div>
                                     <p class="fw-bold small mb-2 o_card_label">TOTAL SICK LEAVE</p>
                                     <h2 class="fw-bold mb-0 o_card_value" t-ref="sickValue"><t t-esc="state.data.sick.value"/></h2>
-                                    <p class="small mt-2 mb-0 o_card_desc">Izin Sakit</p>
+                                    <p class="small mt-2 mb-0 o_card_desc">Sick Leave</p>
                                 </div>
                                 <div class="p-3 rounded-circle o_card_icon_bg">
                                     <i class="fa fa-medkit o_card_icon"/>
@@ -110,7 +110,7 @@
                                 <div>
                                     <p class="fw-bold small mb-2 o_card_label">TOTAL UNPAID LEAVE</p>
                                     <h2 class="fw-bold mb-0 o_card_value" t-ref="unpaidValue"><t t-esc="state.data.unpaid.value"/></h2>
-                                    <p class="small mt-2 mb-0 o_card_desc">Cuti Tanpa Tanggungan</p>
+                                    <p class="small mt-2 mb-0 o_card_desc">Unpaid Leave</p>
                                 </div>
                                 <div class="p-3 rounded-circle o_card_icon_bg">
                                     <i class="fa fa-exclamation-circle o_card_icon"/>
@@ -122,7 +122,7 @@
             </div>
 
             <!-- Detail Lists -->
-            <h3 class="fs-5 fw-semibold mb-3">Detail Karyawan</h3>
+            <h3 class="fs-5 fw-semibold mb-3">Employee Details</h3>
             <div class="row g-4 mb-5">
                 <t t-foreach="['present', 'late', 'sick', 'unpaid']" t-as="type" t-key="type">
                     <div class="col-12 col-md-6 col-xl-3">
@@ -149,7 +149,7 @@
                                 </t>
                                 <t t-if="!state.data[type].list.length">
                                     <div class="text-center py-5">
-                                        <p class="text-muted small">Tidak ada data</p>
+                                        <p class="text-muted small">No data</p>
                                     </div>
                                 </t>
                             </div>
@@ -169,7 +169,7 @@
             <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center gap-3">
                 <div>
                     <h1 class="fs-3 fw-bold mb-1"><t t-esc="state.selectedEmployee.name"/></h1>
-                    <p class="text-muted mb-0">Detail Kehadiran Karyawan</p>
+                    <p class="text-muted mb-0">Employee Attendance Details</p>
                 </div>
                 <div class="d-flex flex-column flex-sm-row gap-2 align-items-stretch align-items-sm-center">
                     <select class="form-select" t-model="state.detailFilter" t-on-change="(ev) => this.onDetailFilterChange(ev)">
@@ -199,7 +199,7 @@
         <t t-if="state.loading">
             <div class="text-center py-5">
                 <i class="fa fa-spinner fa-spin fa-3x text-primary"/>
-                <p class="mt-3 text-muted">Memuat data...</p>
+                <p class="mt-3 text-muted">Loading Data...</p>
             </div>
         </t>
 
@@ -213,7 +213,7 @@
                                 <div>
                                     <p class="fw-bold small mb-2 o_card_label">TOTAL PRESENT</p>
                                     <h2 class="fw-bold mb-0 o_card_value"><t t-esc="state.employeeData.stats.present"/></h2>
-                                    <p class="small mt-2 mb-0 o_card_desc">Hadir Tepat Waktu</p>
+                                    <p class="small mt-2 mb-0 o_card_desc">Arrive on Time</p>
                                 </div>
                                 <div class="p-3 rounded-circle o_card_icon_bg">
                                     <i class="fa fa-check o_card_icon"/>
@@ -230,7 +230,7 @@
                                 <div>
                                     <p class="fw-bold small mb-2 o_card_label">TOTAL LATE ARRIVAL</p>
                                     <h2 class="fw-bold mb-0 o_card_value"><t t-esc="state.employeeData.stats.late"/></h2>
-                                    <p class="small mt-2 mb-0 o_card_desc">Keterlambatan</p>
+                                    <p class="small mt-2 mb-0 o_card_desc">Late</p>
                                 </div>
                                 <div class="p-3 rounded-circle o_card_icon_bg">
                                     <i class="fa fa-clock-o o_card_icon"/>
@@ -247,7 +247,7 @@
                                 <div>
                                     <p class="fw-bold small mb-2 o_card_label">TOTAL SICK LEAVE</p>
                                     <h2 class="fw-bold mb-0 o_card_value"><t t-esc="state.employeeData.stats.sick"/></h2>
-                                    <p class="small mt-2 mb-0 o_card_desc">Izin Sakit</p>
+                                    <p class="small mt-2 mb-0 o_card_desc">Sick Leave</p>
                                 </div>
                                 <div class="p-3 rounded-circle o_card_icon_bg">
                                     <i class="fa fa-medkit o_card_icon"/>
@@ -264,7 +264,7 @@
                                 <div>
                                     <p class="fw-bold small mb-2 o_card_label">TOTAL UNPAID LEAVE</p>
                                     <h2 class="fw-bold mb-0 o_card_value"><t t-esc="state.employeeData.stats.unpaid"/></h2>
-                                    <p class="small mt-2 mb-0 o_card_desc">Cuti Tanpa Tanggungan</p>
+                                    <p class="small mt-2 mb-0 o_card_desc">Unpaid Leave</p>
                                 </div>
                                 <div class="p-3 rounded-circle o_card_icon_bg">
                                     <i class="fa fa-exclamation-circle o_card_icon"/>

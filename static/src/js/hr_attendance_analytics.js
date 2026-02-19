@@ -295,6 +295,18 @@ class HrAttendanceAnalytics extends Component {
 
         console.log("Attendances fetched:", attendances);
 
+        // Convert UTC to local timezone
+        attendances.forEach(att => {
+            if (att.check_in) {
+                const checkInUTC = new Date(att.check_in + ' UTC');
+                att.check_in = this.formatDateTime(checkInUTC);
+            }
+            if (att.check_out) {
+                const checkOutUTC = new Date(att.check_out + ' UTC');
+                att.check_out = this.formatDateTime(checkOutUTC);
+            }
+        });
+
         const stats = {
             present: 0,
             late: 0,
@@ -320,6 +332,16 @@ class HrAttendanceAnalytics extends Component {
         this.state.view = "dashboard";
         this.state.selectedEmployee = null;
         this.state.employeeData = null;
+    }
+
+    formatDateTime(date) {
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        const hours = String(date.getHours()).padStart(2, '0');
+        const minutes = String(date.getMinutes()).padStart(2, '0');
+        const seconds = String(date.getSeconds()).padStart(2, '0');
+        return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
     }
 
     onDetailFilterChange(ev) {
