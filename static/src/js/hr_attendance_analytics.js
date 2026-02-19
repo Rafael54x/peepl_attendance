@@ -94,6 +94,16 @@ class HrAttendanceAnalytics extends Component {
         this.filterEmployeeAttendances();
     }
 
+    onDayChange() {
+        this.state.endDate = this.state.startDate;
+        this.loadData();
+    }
+
+    onDetailDayChange() {
+        this.state.detailEndDate = this.state.detailStartDate;
+        this.filterEmployeeAttendances();
+    }
+
     onDetailStatusFilterChange(ev) {
         this.state.detailStatusFilter = ev.target.value;
         this.filterEmployeeAttendances();

@@ -33,6 +33,9 @@
                             </t>
                         </select>
                     </t>
+                    <t t-elif="state.filter === 'day'">
+                        <input type="date" class="form-control" t-model="state.startDate" t-on-change="() => this.onDayChange()"/>
+                    </t>
                     <t t-else="">
                         <input type="date" class="form-control" t-model="state.startDate" t-on-change="() => this.onDateChange()"/>
                         <span class="text-muted align-self-center d-none d-sm-inline">to</span>
@@ -187,6 +190,9 @@
                             </t>
                         </select>
                     </t>
+                    <t t-elif="state.detailFilter === 'day'">
+                        <input type="date" class="form-control" t-model="state.detailStartDate" t-on-change="() => this.onDetailDayChange()"/>
+                    </t>
                     <t t-elif="state.detailFilter !== 'all'">
                         <input type="date" class="form-control" t-model="state.detailStartDate" t-on-change="() => this.onDetailDateChange()"/>
                         <span class="text-muted align-self-center d-none d-sm-inline">to</span>
@@ -288,7 +294,7 @@
                     </select>
                 </div>
                 <div class="card-body p-0">
-                    <div style="overflow: hidden;">
+                    <div style="overflow-x: auto; -webkit-overflow-scrolling: touch;">
                         <table class="table mb-0 o_modern_table">
                             <thead>
                                 <tr style="background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%); border-bottom: 2px solid #dee2e6;">
