@@ -662,6 +662,13 @@ class HrAttendanceAnalytics extends Component {
                 indexAxis: 'y',
                 responsive: true,
                 maintainAspectRatio: false,
+                onClick: (event, elements) => {
+                    if (elements.length > 0) {
+                        const index = elements[0].index;
+                        const emp = topPerformers[index];
+                        this.viewEmployeeDetail(emp.id, emp.name);
+                    }
+                },
                 plugins: {
                     legend: {
                         display: false
@@ -698,6 +705,9 @@ class HrAttendanceAnalytics extends Component {
                             }
                         }
                     }
+                },
+                onHover: (event, elements) => {
+                    event.native.target.style.cursor = elements.length > 0 ? 'pointer' : 'default';
                 }
             }
         });
