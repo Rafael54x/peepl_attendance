@@ -3,6 +3,7 @@
 import { Component, useState, onWillStart, onMounted, useRef } from "@odoo/owl";
 import { registry } from "@web/core/registry";
 import { useService } from "@web/core/utils/hooks";
+import { loadJS } from "@web/core/assets";
 
 class HrAttendanceAnalytics extends Component {
     static template = "peepl_attendance.HrAttendanceAnalytics";
@@ -11,11 +12,13 @@ class HrAttendanceAnalytics extends Component {
     setup() {
         this.orm = useService("orm");
         this.summaryRefs = {
-            present: useRef("presentValue"),
+            attendance: useRef("attendanceValue"),
             late: useRef("lateValue"),
             sick: useRef("sickValue"),
             unpaid: useRef("unpaidValue")
         };
+        this.chartRef = useRef("pieChart");
+        this.barChartRef = useRef("barChart");
         this.state = useState({
             loading: true,
             filter: "year",
@@ -38,6 +41,7 @@ class HrAttendanceAnalytics extends Component {
             currentPage: 1,
             pageSize: 20,
             data: {
+                attendance: { value: "0%" },
                 present: { value: "0%", list: [] },
                 late: { value: "0%", list: [] },
                 sick: { value: "0%", list: [] },
@@ -51,6 +55,8 @@ class HrAttendanceAnalytics extends Component {
 
         onMounted(() => {
             this.animateCounters();
+            this.renderChart();
+            this.renderBarChart();
         });
     }
 
@@ -96,6 +102,14 @@ class HrAttendanceAnalytics extends Component {
     onYearChange() {
         this.state.startDate = this.state.selectedYear + "-01-01";
         this.state.endDate = this.state.selectedYear + "-12-31";
+        this.loadData();
+    }
+
+    onFilterChange(ev) {
+        this.state.filter = ev.target.value;
+        this.state.startDate = this.getDefaultStartDate(this.state.filter);
+        this.state.endDate = this.getDefaultEndDate();
+        this.validateDateRange();
         this.loadData();
     }
 
@@ -189,6 +203,73 @@ class HrAttendanceAnalytics extends Component {
         return Math.ceil(this.state.employeeData.filteredAttendances.length / this.state.pageSize);
     }
 
+    renderChart() {
+        if (!this.chartRef.el) return;
+
+        const ctx = this.chartRef.el.getContext('2d');
+        
+        if (this.chart) {
+            this.chart.destroy();
+        }
+
+        // Get data from summary cards (exclude present)
+        const latePct = parseFloat(this.state.data.late.value);
+        const sickPct = parseFloat(this.state.data.sick.value);
+        const unpaidPct = parseFloat(this.state.data.unpaid.value);
+
+        const hasData = latePct > 0 || sickPct > 0 || unpaidPct > 0;
+
+        if (!hasData) {
+            ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+            ctx.font = '14px Arial';
+            ctx.fillStyle = '#6c757d';
+            ctx.textAlign = 'center';
+            ctx.fillText('No data available', ctx.canvas.width / 2, ctx.canvas.height / 2);
+            return;
+        }
+
+        this.chart = new Chart(ctx, {
+            type: 'pie',
+            data: {
+                labels: ['Late Arrival', 'Sick Leave', 'Unpaid Leave'],
+                datasets: [{
+                    data: [latePct, sickPct, unpaidPct],
+                    backgroundColor: [
+                        '#d97706',
+                        '#ea580c',
+                        '#dc2626'
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            padding: 15,
+                            font: {
+                                size: 12,
+                                weight: '500'
+                            }
+                        }
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                const label = context.label || '';
+                                const value = context.parsed || 0;
+                                return label + ': ' + value.toFixed(2) + '%';
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    }
+
     onFilterChange(ev) {
         this.state.filter = ev.target.value;
         this.state.startDate = this.getDefaultStartDate(this.state.filter);
@@ -199,6 +280,13 @@ class HrAttendanceAnalytics extends Component {
 
     onDateChange() {
         this.validateDateRange();
+        this.loadData();
+    }
+
+    onWeekChange() {
+        const weekStart = new Date(this.state.startDate);
+        weekStart.setDate(weekStart.getDate() - 6);
+        this.state.startDate = weekStart.toISOString().split('T')[0];
         this.loadData();
     }
 
@@ -262,6 +350,20 @@ class HrAttendanceAnalytics extends Component {
             empDeptMap[emp.id] = emp.department_id ? emp.department_id[1] : "No Department";
         });
 
+        // Calculate total attendance by type
+        const totalStats = {
+            present: 0,
+            late: 0,
+            sick: 0,
+            unpaid: 0,
+            total: attendances.length
+        };
+
+        attendances.forEach(att => {
+            const type = att.attendance_type || "present";
+            totalStats[type]++;
+        });
+
         // Group by employee
         const empMap = {};
         attendances.forEach(att => {
@@ -297,12 +399,14 @@ class HrAttendanceAnalytics extends Component {
         Object.values(empMap).forEach(emp => {
             const empId = Object.keys(empMap).find(key => empMap[key] === emp);
             if (emp.total > 0) {
-                const presentPct = ((emp.present / emp.total) * 100).toFixed(1);
+                // For present: calculate (present + late) / total
+                const presentPct = (((emp.present + emp.late) / emp.total) * 100).toFixed(1);
                 const latePct = ((emp.late / emp.total) * 100).toFixed(1);
                 const sickPct = ((emp.sick / emp.total) * 100).toFixed(1);
                 const unpaidPct = ((emp.unpaid / emp.total) * 100).toFixed(1);
 
-                if (emp.present > 0) {
+                // Show in present list if employee has present or late attendance
+                if (emp.present > 0 || emp.late > 0) {
                     grouped.present.push({ id: empId, name: emp.name, dept: emp.dept, pct: presentPct });
                 }
                 if (emp.late > 0) {
@@ -317,20 +421,27 @@ class HrAttendanceAnalytics extends Component {
             }
         });
 
-        // Calculate overall percentages
+        // Set data with total percentage and top 10 list
         Object.keys(grouped).forEach(type => {
             const list = grouped[type]
                 .sort((a, b) => b.pct - a.pct)
                 .slice(0, 10);
 
-            const totalPct = list.reduce((sum, emp) => sum + parseFloat(emp.pct), 0);
-            const avgPct = list.length > 0 ? (totalPct / list.length).toFixed(2) : "0.00";
+            const totalPct = totalStats.total > 0 ? ((totalStats[type] / totalStats.total) * 100).toFixed(2) : "0.00";
 
-            this.state.data[type] = { value: avgPct + "%", list };
+            this.state.data[type] = { value: totalPct + "%", list };
         });
+
+        // Calculate attendance (present + late)
+        const attendancePct = totalStats.total > 0 ? (((totalStats.present + totalStats.late) / totalStats.total) * 100).toFixed(2) : "0.00";
+        this.state.data.attendance = { value: attendancePct + "%" };
 
         this.state.loading = false;
         this.animateCounters();
+        setTimeout(() => {
+            this.renderChart();
+            this.renderBarChart();
+        }, 50);
     }
 
     animateCounters() {
@@ -401,13 +512,20 @@ class HrAttendanceAnalytics extends Component {
             present: 0,
             late: 0,
             sick: 0,
-            unpaid: 0
+            unpaid: 0,
+            total: attendances.length
         };
 
         attendances.forEach(att => {
             const type = att.attendance_type || "present";
             stats[type]++;
         });
+
+        // Calculate percentages
+        stats.presentPct = stats.total > 0 ? ((stats.present / stats.total) * 100).toFixed(1) : "0.0";
+        stats.latePct = stats.total > 0 ? ((stats.late / stats.total) * 100).toFixed(1) : "0.0";
+        stats.sickPct = stats.total > 0 ? ((stats.sick / stats.total) * 100).toFixed(1) : "0.0";
+        stats.unpaidPct = stats.total > 0 ? ((stats.unpaid / stats.total) * 100).toFixed(1) : "0.0";
 
         this.state.employeeData = {
             stats,
@@ -423,6 +541,10 @@ class HrAttendanceAnalytics extends Component {
         this.state.view = "dashboard";
         this.state.selectedEmployee = null;
         this.state.employeeData = null;
+        setTimeout(() => {
+            this.renderChart();
+            this.renderBarChart();
+        }, 100);
     }
 
     formatDateTime(date) {
@@ -482,7 +604,8 @@ class HrAttendanceAnalytics extends Component {
             present: 0,
             late: 0,
             sick: 0,
-            unpaid: 0
+            unpaid: 0,
+            total: filtered.length
         };
 
         filtered.forEach(att => {
@@ -490,11 +613,96 @@ class HrAttendanceAnalytics extends Component {
             stats[type]++;
         });
 
+        // Calculate percentages
+        stats.presentPct = stats.total > 0 ? ((stats.present / stats.total) * 100).toFixed(1) : "0.0";
+        stats.latePct = stats.total > 0 ? ((stats.late / stats.total) * 100).toFixed(1) : "0.0";
+        stats.sickPct = stats.total > 0 ? ((stats.sick / stats.total) * 100).toFixed(1) : "0.0";
+        stats.unpaidPct = stats.total > 0 ? ((stats.unpaid / stats.total) * 100).toFixed(1) : "0.0";
+
         this.state.employeeData.attendances = filtered;
         this.state.employeeData.filteredAttendances = filtered;
         this.state.employeeData.stats = stats;
         this.state.currentPage = 1;
     }
+
+    renderBarChart() {
+        if (!this.barChartRef.el) return;
+
+        const ctx = this.barChartRef.el.getContext('2d');
+        
+        if (this.barChart) {
+            this.barChart.destroy();
+        }
+
+        const topPerformers = this.state.data.present.list
+            .sort((a, b) => parseFloat(b.pct) - parseFloat(a.pct))
+            .slice(0, 10);
+
+        if (topPerformers.length === 0) {
+            ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+            ctx.font = '14px Arial';
+            ctx.fillStyle = '#6c757d';
+            ctx.textAlign = 'center';
+            ctx.fillText('No data available', ctx.canvas.width / 2, ctx.canvas.height / 2);
+            return;
+        }
+
+        this.barChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: topPerformers.map(emp => emp.name),
+                datasets: [{
+                    label: 'Present Rate (%)',
+                    data: topPerformers.map(emp => parseFloat(emp.pct)),
+                    backgroundColor: '#059669',
+                    borderRadius: 8
+                }]
+            },
+            options: {
+                indexAxis: 'y',
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return context.parsed.x.toFixed(1) + '%';
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        beginAtZero: true,
+                        max: 100,
+                        ticks: {
+                            callback: function(value) {
+                                return value + '%';
+                            }
+                        },
+                        grid: {
+                            display: true,
+                            color: 'rgba(0, 0, 0, 0.05)'
+                        }
+                    },
+                    y: {
+                        grid: {
+                            display: false
+                        },
+                        ticks: {
+                            font: {
+                                size: 11
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    }
 }
 
 registry.category("actions").add("hr_attendance_analytics", HrAttendanceAnalytics);
+

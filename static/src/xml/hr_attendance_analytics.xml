@@ -95,8 +95,8 @@
                             <div class="d-flex justify-content-between align-items-start">
                                 <div>
                                     <p class="fw-bold small mb-2 o_card_label">TOTAL PRESENT</p>
-                                    <h2 class="fw-bold mb-0 o_card_value" t-ref="presentValue"><t t-esc="state.data.present.value"/></h2>
-                                    <p class="small mt-2 mb-0 o_card_desc">Employees Arrive on Time</p>
+                                    <h2 class="fw-bold mb-0 o_card_value" t-ref="attendanceValue"><t t-esc="state.data.attendance.value"/></h2>
+                                    <p class="small mt-2 mb-0 o_card_desc">Employees Come to Work</p>
                                 </div>
                                 <div class="p-3 rounded-circle o_card_icon_bg">
                                     <i class="fa fa-check o_card_icon"/>
@@ -158,8 +158,39 @@
                 </div>
             </div>
 
+            <!-- Chart Section -->
+            <div class="row g-4 mb-5">
+                <div class="col-12 col-lg-6">
+                    <div class="card border-0 shadow-sm" style="border-radius: 16px; overflow: hidden;">
+                        <div class="card-header bg-white border-0 py-3 px-4">
+                            <h5 class="fw-bold mb-0">Attendance Distribution</h5>
+                        </div>
+                        <div class="card-body p-4">
+                            <div style="height: 300px; position: relative;">
+                                <canvas t-ref="pieChart"/>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12 col-lg-6">
+                    <div class="card border-0 shadow-sm" style="border-radius: 16px; overflow: hidden;">
+                        <div class="card-header bg-white border-0 py-3 px-4">
+                            <h5 class="fw-bold mb-0">Top 10 Performers (Present)</h5>
+                        </div>
+                        <div class="card-body p-4">
+                            <div style="height: 300px; position: relative;">
+                                <canvas t-ref="barChart"/>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <!-- Detail Lists -->
-            <h3 class="fs-5 fw-semibold mb-3">Employee Details</h3>
+        <div class="mb-3">
+            <h3 class="fs-5 fw-semibold mb-1">Employee Details</h3>
+            <p class="text-muted small mb-0">Showing the top 10 highest percentages for each category.</p>
+        </div>
             <div class="row g-4 mb-5">
                 <t t-foreach="['present', 'late', 'sick', 'unpaid']" t-as="type" t-key="type">
                     <div class="col-12 col-md-6 col-xl-3">
@@ -285,9 +316,9 @@
                         <div class="card-body p-4">
                             <div class="d-flex justify-content-between align-items-start">
                                 <div>
-                                    <p class="fw-bold small mb-2 o_card_label">TOTAL PRESENT</p>
-                                    <h2 class="fw-bold mb-0 o_card_value"><t t-esc="state.employeeData.stats.present"/></h2>
-                                    <p class="small mt-2 mb-0 o_card_desc">Arrive on Time</p>
+                                    <p class="fw-bold small mb-2 o_card_label">PRESENT ON TIME</p>
+                                    <h2 class="fw-bold mb-0 o_card_value"><t t-esc="state.employeeData.stats.presentPct"/>%</h2>
+                                    <p class="small mt-2 mb-0 o_card_desc"><t t-esc="state.employeeData.stats.present"/> days</p>
                                 </div>
                                 <div class="p-3 rounded-circle o_card_icon_bg">
                                     <i class="fa fa-check o_card_icon"/>
@@ -302,9 +333,9 @@
                         <div class="card-body p-4">
                             <div class="d-flex justify-content-between align-items-start">
                                 <div>
-                                    <p class="fw-bold small mb-2 o_card_label">TOTAL LATE ARRIVAL</p>
-                                    <h2 class="fw-bold mb-0 o_card_value"><t t-esc="state.employeeData.stats.late"/></h2>
-                                    <p class="small mt-2 mb-0 o_card_desc">Late</p>
+                                    <p class="fw-bold small mb-2 o_card_label">LATE ARRIVAL</p>
+                                    <h2 class="fw-bold mb-0 o_card_value"><t t-esc="state.employeeData.stats.latePct"/>%</h2>
+                                    <p class="small mt-2 mb-0 o_card_desc"><t t-esc="state.employeeData.stats.late"/> days</p>
                                 </div>
                                 <div class="p-3 rounded-circle o_card_icon_bg">
                                     <i class="fa fa-clock-o o_card_icon"/>
@@ -319,9 +350,9 @@
                         <div class="card-body p-4">
                             <div class="d-flex justify-content-between align-items-start">
                                 <div>
-                                    <p class="fw-bold small mb-2 o_card_label">TOTAL SICK LEAVE</p>
-                                    <h2 class="fw-bold mb-0 o_card_value"><t t-esc="state.employeeData.stats.sick"/></h2>
-                                    <p class="small mt-2 mb-0 o_card_desc">Sick Leave</p>
+                                    <p class="fw-bold small mb-2 o_card_label">SICK LEAVE</p>
+                                    <h2 class="fw-bold mb-0 o_card_value"><t t-esc="state.employeeData.stats.sickPct"/>%</h2>
+                                    <p class="small mt-2 mb-0 o_card_desc"><t t-esc="state.employeeData.stats.sick"/> days</p>
                                 </div>
                                 <div class="p-3 rounded-circle o_card_icon_bg">
                                     <i class="fa fa-medkit o_card_icon"/>
@@ -336,9 +367,9 @@
                         <div class="card-body p-4">
                             <div class="d-flex justify-content-between align-items-start">
                                 <div>
-                                    <p class="fw-bold small mb-2 o_card_label">TOTAL UNPAID LEAVE</p>
-                                    <h2 class="fw-bold mb-0 o_card_value"><t t-esc="state.employeeData.stats.unpaid"/></h2>
-                                    <p class="small mt-2 mb-0 o_card_desc">Unpaid Leave</p>
+                                    <p class="fw-bold small mb-2 o_card_label">UNPAID LEAVE</p>
+                                    <h2 class="fw-bold mb-0 o_card_value"><t t-esc="state.employeeData.stats.unpaidPct"/>%</h2>
+                                    <p class="small mt-2 mb-0 o_card_desc"><t t-esc="state.employeeData.stats.unpaid"/> days</p>
                                 </div>
                                 <div class="p-3 rounded-circle o_card_icon_bg">
                                     <i class="fa fa-exclamation-circle o_card_icon"/>
@@ -361,7 +392,7 @@
                         </select>
                         <select class="form-select" t-model="state.detailStatusFilter" t-on-change="(ev) => this.onDetailStatusFilterChange(ev)" style="width: auto; border-radius: 12px; border: 1px solid #dee2e6; font-size: 14px;">
                             <option value="all">All Status</option>
-                            <option value="present">Present</option>
+                            <option value="present">Present on Time</option>
                             <option value="late">Late</option>
                             <option value="sick">Sick</option>
                             <option value="unpaid">Unpaid</option>
@@ -408,11 +439,11 @@
                                         </td>
                                         <td class="px-4 py-3" style="border: none; border-bottom: 1px solid #f0f0f0;">
                                             <span class="badge o_modern_badge" t-attf-class="o_modern_badge_{{att.attendance_type || 'present'}}">
-                                                <t t-if="att.attendance_type === 'present'">Present</t>
+                                                <t t-if="att.attendance_type === 'present'">Present on Time</t>
                                                 <t t-elif="att.attendance_type === 'late'">Late</t>
                                                 <t t-elif="att.attendance_type === 'sick'">Sick</t>
                                                 <t t-elif="att.attendance_type === 'unpaid'">Unpaid</t>
-                                                <t t-else="">Present</t>
+                                                <t t-else="">Present on Time</t>
                                             </span>
                                         </td>
                                     </tr>

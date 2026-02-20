@@ -22,6 +22,8 @@ Attendance System
             'peepl_attendance/static/src/js/hr_attendance_analytics.js',
             'peepl_attendance/static/src/xml/hr_attendance_analytics.xml',
             'peepl_attendance/static/src/css/hr_attendance_analytics.css',
+            ('include', 'web._assets_helpers'),
+            'https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js',
         ],
     },
     'demo': [],

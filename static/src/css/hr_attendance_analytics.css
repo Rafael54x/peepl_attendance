@@ -653,3 +653,16 @@ body.o_dark .o_modern_badge_unpaid,
 .o_detail_card_body::-webkit-scrollbar {
     display: none; /* Chrome, Safari, Opera */
 }
+
+
+/* Chart Dark Mode */
+@media (prefers-color-scheme: dark) {
+    canvas {
+        filter: brightness(1.2) contrast(1.1);
+    }
+}
+
+body.o_dark canvas,
+.o_dark canvas {
+    filter: brightness(1.2) contrast(1.1);
+}
