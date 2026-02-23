@@ -107,9 +107,35 @@ class HrAttendanceAnalytics extends Component {
 
     onFilterChange(ev) {
         this.state.filter = ev.target.value;
-        this.state.startDate = this.getDefaultStartDate(this.state.filter);
-        this.state.endDate = this.getDefaultEndDate();
-        this.validateDateRange();
+        const now = new Date();
+        const year = this.state.selectedYear;
+        const month = this.state.selectedMonth;
+        const quarter = this.state.selectedQuarter;
+        
+        if (this.state.filter === 'year') {
+            this.state.startDate = year + "-01-01";
+            this.state.endDate = year + "-12-31";
+        } else if (this.state.filter === 'month') {
+            const monthStr = String(month).padStart(2, '0');
+            const lastDay = new Date(year, month, 0).getDate();
+            this.state.startDate = `${year}-${monthStr}-01`;
+            this.state.endDate = `${year}-${monthStr}-${lastDay}`;
+        } else if (this.state.filter === 'quarter') {
+            const startMonth = (quarter - 1) * 3 + 1;
+            const endMonth = startMonth + 2;
+            const lastDay = new Date(year, endMonth, 0).getDate();
+            this.state.startDate = `${year}-${String(startMonth).padStart(2, '0')}-01`;
+            this.state.endDate = `${year}-${String(endMonth).padStart(2, '0')}-${lastDay}`;
+        } else if (this.state.filter === 'day') {
+            this.state.startDate = now.toISOString().split('T')[0];
+            this.state.endDate = now.toISOString().split('T')[0];
+        } else if (this.state.filter === 'week') {
+            const weekStart = new Date(now);
+            weekStart.setDate(now.getDate() - 6);
+            this.state.startDate = weekStart.toISOString().split('T')[0];
+            this.state.endDate = now.toISOString().split('T')[0];
+        }
+        
         this.loadData();
     }
 
@@ -268,14 +294,6 @@ class HrAttendanceAnalytics extends Component {
                 }
             }
         });
-    }
-
-    onFilterChange(ev) {
-        this.state.filter = ev.target.value;
-        this.state.startDate = this.getDefaultStartDate(this.state.filter);
-        this.state.endDate = this.getDefaultEndDate();
-        this.validateDateRange();
-        this.loadData();
     }
 
     onDateChange() {
@@ -560,8 +578,25 @@ class HrAttendanceAnalytics extends Component {
     onDetailFilterChange(ev) {
         this.state.detailFilter = ev.target.value;
         const now = new Date();
+        const year = this.state.detailSelectedYear;
+        const month = this.state.detailSelectedMonth;
+        const quarter = this.state.detailSelectedQuarter;
         
-        if (this.state.detailFilter === 'day') {
+        if (this.state.detailFilter === 'year') {
+            this.state.detailStartDate = year + "-01-01";
+            this.state.detailEndDate = year + "-12-31";
+        } else if (this.state.detailFilter === 'month') {
+            const monthStr = String(month).padStart(2, '0');
+            const lastDay = new Date(year, month, 0).getDate();
+            this.state.detailStartDate = `${year}-${monthStr}-01`;
+            this.state.detailEndDate = `${year}-${monthStr}-${lastDay}`;
+        } else if (this.state.detailFilter === 'quarter') {
+            const startMonth = (quarter - 1) * 3 + 1;
+            const endMonth = startMonth + 2;
+            const lastDay = new Date(year, endMonth, 0).getDate();
+            this.state.detailStartDate = `${year}-${String(startMonth).padStart(2, '0')}-01`;
+            this.state.detailEndDate = `${year}-${String(endMonth).padStart(2, '0')}-${lastDay}`;
+        } else if (this.state.detailFilter === 'day') {
             this.state.detailStartDate = now.toISOString().split('T')[0];
             this.state.detailEndDate = now.toISOString().split('T')[0];
         } else if (this.state.detailFilter === 'week') {
@@ -569,9 +604,6 @@ class HrAttendanceAnalytics extends Component {
             weekStart.setDate(now.getDate() - 6);
             this.state.detailStartDate = weekStart.toISOString().split('T')[0];
             this.state.detailEndDate = now.toISOString().split('T')[0];
-        } else if (this.state.detailFilter !== 'all' && this.state.detailFilter !== 'year' && this.state.detailFilter !== 'month' && this.state.detailFilter !== 'quarter') {
-            this.state.detailStartDate = this.getDefaultStartDate(this.state.detailFilter);
-            this.state.detailEndDate = this.getDefaultEndDate();
         }
         
         this.filterEmployeeAttendances();
