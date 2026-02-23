@@ -233,6 +233,7 @@ class HrAttendanceAnalytics extends Component {
         if (!this.chartRef.el) return;
 
         const ctx = this.chartRef.el.getContext('2d');
+        const container = this.chartRef.el.parentElement;
         
         if (this.chart) {
             this.chart.destroy();
@@ -245,12 +246,17 @@ class HrAttendanceAnalytics extends Component {
 
         const hasData = latePct > 0 || sickPct > 0 || unpaidPct > 0;
 
+        // Remove existing no-data message
+        const existingMsg = container.querySelector('.no-data-message');
+        if (existingMsg) existingMsg.remove();
+
         if (!hasData) {
-            ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
-            ctx.font = '14px Arial';
-            ctx.fillStyle = '#6c757d';
-            ctx.textAlign = 'center';
-            ctx.fillText('No data available', ctx.canvas.width / 2, ctx.canvas.height / 2);
+            const noDataDiv = document.createElement('div');
+            noDataDiv.className = 'no-data-message';
+            noDataDiv.style.cssText = 'position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: #6c757d; font-size: 14px;';
+            noDataDiv.textContent = 'No data available';
+            container.style.position = 'relative';
+            container.appendChild(noDataDiv);
             return;
         }
 
@@ -661,6 +667,7 @@ class HrAttendanceAnalytics extends Component {
         if (!this.barChartRef.el) return;
 
         const ctx = this.barChartRef.el.getContext('2d');
+        const container = this.barChartRef.el.parentElement;
         
         if (this.barChart) {
             this.barChart.destroy();
@@ -670,12 +677,17 @@ class HrAttendanceAnalytics extends Component {
             .sort((a, b) => parseFloat(b.pct) - parseFloat(a.pct))
             .slice(0, 10);
 
+        // Remove existing no-data message
+        const existingMsg = container.querySelector('.no-data-message');
+        if (existingMsg) existingMsg.remove();
+
         if (topPerformers.length === 0) {
-            ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
-            ctx.font = '14px Arial';
-            ctx.fillStyle = '#6c757d';
-            ctx.textAlign = 'center';
-            ctx.fillText('No data available', ctx.canvas.width / 2, ctx.canvas.height / 2);
+            const noDataDiv = document.createElement('div');
+            noDataDiv.className = 'no-data-message';
+            noDataDiv.style.cssText = 'position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: #6c757d; font-size: 14px;';
+            noDataDiv.textContent = 'No data available';
+            container.style.position = 'relative';
+            container.appendChild(noDataDiv);
             return;
         }
 
